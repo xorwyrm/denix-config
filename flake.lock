@@ -319,11 +319,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793565012,
-        "narHash": "sha256-B/hdKMvXEwf3eU+pYa1su+m8A0nae1vVYSRhZZrK5qQ=",
+        "lastModified": 1793565488,
+        "narHash": "sha256-qCS2ceOcgjPHw6jhdEW/l2CaXCph+K7yCrskTn0dDMo=",
         "owner": "xorwyrm",
         "repo": "draconisplusplus-plugins",
-        "rev": "bbed0153ec662761184b4a962dc2b54e0d48201a",
+        "rev": "f3f0214ab968c2af96a79b3df698513c39b6a144",
         "type": "github"
       },
       "original": {
@@ -1918,10 +1918,10 @@
         "timeless-fonts-src": "timeless-fonts-src"
       },
       "locked": {
-        "lastModified": 1793559500,
-        "narHash": "sha256-6QshoNvPanwplg5QlMmH8C2olOblYLJxQN6+EeHTC5Q=",
+        "lastModified": 1793564507,
+        "narHash": "sha256-y7TRxEMB5Cu89JUEmVi/9A571Xz/YbL0bgjnUaWyPZU=",
         "ref": "refs/heads/master",
-        "rev": "c76eedefea33faeaccb9096dc307ded244463b6a",
+        "rev": "6223b9c192616fc79b964c26aa2bc382a5c90adc",
         "shallow": true,
         "type": "git",
         "url": "https://tangled.org/did:plc:j5hmlfdrwkvtxm7cjmu7j2is"

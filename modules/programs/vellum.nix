@@ -20,14 +20,16 @@ delib.module {
       patches = (old.patches or []) ++ [./quickshell-workspace-address.patch ./quickshell-close-child-fds.patch];
     });
 
-    # The T3 thread feed is a WebSocket, which Quickshell does not bundle.
-    quickshell = (quickshellBase.withModules [pkgs.qt6.qtwebsockets]).overrideAttrs (old: {
-      installPhase =
-        builtins.replaceStrings
-        ["${quickshellBase.unwrapped}"]
-        ["${quickshellUnwrapped}"]
-        old.installPhase;
-    });
+    # The T3 thread feed is a WebSocket, which Quickshell does not bundle. The
+    # wrapper's installPhase copies the unwrapped build; point it at the patched
+    # one directly. (Rewriting the old string with replaceStrings would keep the
+    # stock build as a dependency, so it would still get built.)
+    quickshell = (quickshellBase.withModules [pkgs.qt6.qtwebsockets]).overrideAttrs {
+      installPhase = ''
+        mkdir -p $out
+        cp -r ${quickshellUnwrapped}/* $out
+      '';
+    };
 
     vellum = pkgs.writeShellScriptBin "vellum" ''
       exec ${quickshell}/bin/quickshell -p ${../../files/vellum} "$@"
