@@ -101,6 +101,13 @@ delib.module {
                 "test_expiry"
               ];
           });
+          # bumble's transport resync test counts retries against the clock
+          # and fails under build load; it's in the same uncached chain.
+          bumble = super.bumble.overridePythonAttrs (old: {
+            disabledTests =
+              (old.disabledTests or [])
+              ++ ["test_resync_fails_when_the_reset_is_not_answered"];
+          });
         };
       };
       extraComponents = [
