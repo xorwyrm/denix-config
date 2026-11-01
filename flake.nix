@@ -172,6 +172,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Tangled's own flake, for the knot on argo. Not following our nixpkgs:
+    # its Rust build is pinned to the nixpkgs it's tested against.
+    tangled.url = "git+https://tangled.org/did:plc:j5hmlfdrwkvtxm7cjmu7j2is";
+
     t3code-flake = {
       url = "github:omarcresp/t3code-flake";
       inputs.nixpkgs.follows = "nixpkgs";

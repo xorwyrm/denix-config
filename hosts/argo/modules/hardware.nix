@@ -72,6 +72,9 @@ in
           work = btrfs "work" "raid0" {
             "/home" = "/home";
             "/scratch" = "/scratch";
+            # The Tangled knot's repositories; created by hand on the running
+            # system on October 31, 2026, and backed up hourly like home.
+            "/knot" = "/var/lib/knot";
           };
         };
       };
@@ -84,6 +87,7 @@ in
         "/var/log" = "system";
         "/home" = "work";
         "/scratch" = "work";
+        "/var/lib/knot" = "work";
       };
 
       # Checksums only help if something reads the data: monthly scrubs find bad

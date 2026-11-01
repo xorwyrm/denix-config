@@ -89,6 +89,9 @@ in
           "/root"
           "/var/lib/nixos"
           "/var/lib/nix-builder"
+          # The Tangled knot's own subvolume, also in the hourly job below;
+          # here for the longer daily, monthly and yearly history.
+          "/var/lib/knot"
           backupStage
         ];
 
@@ -200,12 +203,13 @@ in
         '';
       };
 
-      # Home is on the striped filesystem, so a dead drive loses it; hourly
-      # snapshots cap that at an hour. Mail is on the mirror and stays nightly.
+      # Home and the knot's repositories are on the striped filesystem, so a
+      # dead drive loses them; hourly snapshots cap that at an hour. Mail is on
+      # the mirror and stays nightly.
       services.restic.backups."${backupName}-home" = {
         environmentFile = config.sops.templates."restic-b2.env".path;
         passwordFile = config.sops.secrets.restic_repository_password.path;
-        paths = [home homeStage];
+        paths = [home homeStage "/var/lib/knot"];
         exclude = excludes;
 
         extraBackupArgs = [

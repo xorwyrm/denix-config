@@ -13,6 +13,7 @@ delib.module {
     inputs.sops-nix.nixosModules.sops
     inputs.impermanence.nixosModules.impermanence
     inputs.lanzaboote.nixosModules.lanzaboote
+    inputs.tangled.nixosModules.knot-rs
     (
       {pkgs, ...}: let
         # sops-nix still requests this builder after its removal from nixpkgs.
