@@ -65,7 +65,6 @@
       };
     };
 
-    # Private; fetched over HTTPS with the user's git credentials.
     fleetd = {
       url = "git+https://github.com/xorwyrm/fleetd";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -233,7 +232,7 @@
           inherit inputs;
         };
       };
-  in rec {
+  in {
     nixosConfigurations =
       inputs.nixpkgs.lib.getAttrs ["argo" "navis" "polaris"]
       (mkConfigurations "nixos");
