@@ -97,53 +97,6 @@
         "type": "github"
       }
     },
-    "caelestia-cli": {
-      "inputs": {
-        "caelestia-shell": [
-          "caelestia-shell"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1792383479,
-        "narHash": "sha256-G6CFLzzi+K1fWxN3JU+WS1B8Zh8OZcTPHZJjCrpcy6U=",
-        "owner": "dim-ghub",
-        "repo": "caelestia-cli",
-        "rev": "a60b58fcde7e3f7dd303662f0280231bf36870eb",
-        "type": "github"
-      },
-      "original": {
-        "owner": "dim-ghub",
-        "repo": "caelestia-cli",
-        "rev": "a60b58fcde7e3f7dd303662f0280231bf36870eb",
-        "type": "github"
-      }
-    },
-    "caelestia-shell": {
-      "inputs": {
-        "caelestia-cli": "caelestia-cli",
-        "m3shapes": "m3shapes",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "quickshell": "quickshell"
-      },
-      "locked": {
-        "lastModified": 1792537728,
-        "narHash": "sha256-KT9diRSKpVaEQBXdIpPAvqIyQFEsPAyMFlLqiYErfK0=",
-        "owner": "dim-ghub",
-        "repo": "caelestia-shell",
-        "rev": "f4ade958c169a3d41e25415371fb208710ead5e2",
-        "type": "github"
-      },
-      "original": {
-        "owner": "dim-ghub",
-        "repo": "caelestia-shell",
-        "type": "github"
-      }
-    },
     "catppuccin": {
       "inputs": {
         "nixpkgs": [
@@ -1177,28 +1130,6 @@
         "type": "github"
       }
     },
-    "m3shapes": {
-      "inputs": {
-        "nixpkgs": [
-          "caelestia-shell",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1787906858,
-        "narHash": "sha256-YZelgEZflFNwGutX4/tIzBdbOeghJgE2oDw0uWYGxns=",
-        "owner": "soramanew",
-        "repo": "m3shapes",
-        "rev": "32ad9ce328bb77ed349b40a3be10ee9ea610b8ab",
-        "type": "github"
-      },
-      "original": {
-        "owner": "soramanew",
-        "repo": "m3shapes",
-        "rev": "32ad9ce328bb77ed349b40a3be10ee9ea610b8ab",
-        "type": "github"
-      }
-    },
     "menu": {
       "flake": false,
       "locked": {
@@ -1635,7 +1566,6 @@
     "quickshell": {
       "inputs": {
         "nixpkgs": [
-          "caelestia-shell",
           "nixpkgs"
         ]
       },
@@ -1672,7 +1602,6 @@
     "root": {
       "inputs": {
         "bang-bang": "bang-bang",
-        "caelestia-shell": "caelestia-shell",
         "catppuccin": "catppuccin",
         "codex-desktop-linux": "codex-desktop-linux",
         "cua": "cua",
@@ -1698,6 +1627,7 @@
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_4",
         "nixvim": "nixvim",
+        "quickshell": "quickshell",
         "replay-fish": "replay-fish",
         "snappy-switcher": "snappy-switcher",
         "sops-nix": "sops-nix",

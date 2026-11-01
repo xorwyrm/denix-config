@@ -13,25 +13,6 @@
       flake = false;
     };
 
-    caelestia-shell = {
-      url = "github:dim-ghub/caelestia-shell";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-
-        # caelestia-cli e6b4900 ("merge upstream") puts ffmpeg in
-        # propagatedBuildInputs without taking it as a package argument, so the
-        # CLI no longer evaluates. Drop this pin once upstream adds the
-        # argument back.
-        caelestia-cli = {
-          url = "github:dim-ghub/caelestia-cli/a60b58fcde7e3f7dd303662f0280231bf36870eb";
-          inputs = {
-            nixpkgs.follows = "nixpkgs";
-            caelestia-shell.follows = "caelestia-shell";
-          };
-        };
-      };
-    };
-
     catppuccin = {
       url = "github:catppuccin/nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -148,6 +129,11 @@
 
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    quickshell = {
+      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

@@ -15,9 +15,7 @@ delib.module {
   home.ifEnabled = {myconfig, ...}: let
     inherit (pkgs.stdenv.hostPlatform) system;
 
-    # Caelestia's flake still pins Quickshell, so reuse that revision (and its
-    # build) until the caelestia-shell input is dropped.
-    quickshellBase = inputs.caelestia-shell.inputs.quickshell.packages.${system}.default;
+    quickshellBase = inputs.quickshell.packages.${system}.default;
     quickshellUnwrapped = quickshellBase.unwrapped.overrideAttrs (old: {
       patches = (old.patches or []) ++ [./quickshell-workspace-address.patch ./quickshell-close-child-fds.patch];
     });
