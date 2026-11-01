@@ -173,8 +173,14 @@
     };
 
     # Tangled's own flake, for the knot on argo. Not following our nixpkgs:
-    # its Rust build is pinned to the nixpkgs it's tested against.
-    tangled.url = "git+https://tangled.org/did:plc:j5hmlfdrwkvtxm7cjmu7j2is";
+    # its Rust build is pinned to the nixpkgs it's tested against. Shallow,
+    # since its full history is a ~90 MB clone. Its flake-compat (only for
+    # default.nix) is dropped: Tangled's lock carries a URL Nix 2.34 rejects
+    # as a mismatch when fetching it.
+    tangled = {
+      url = "git+https://tangled.org/did:plc:j5hmlfdrwkvtxm7cjmu7j2is?shallow=1";
+      inputs.flake-compat.follows = "";
+    };
 
     t3code-flake = {
       url = "github:omarcresp/t3code-flake";
