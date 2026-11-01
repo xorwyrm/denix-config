@@ -66,7 +66,11 @@ in
         enable = true;
         tunnels.${tunnelId} = {
           credentialsFile = config.sops.secrets.knot_tunnel_credentials.path;
-          ingress.${hostname}.service = "http://127.0.0.1:5555";
+          ingress = {
+            ${hostname}.service = "http://127.0.0.1:5555";
+            # The xorwyrm.sh PDS (pds.nix).
+            "pds.xorwyrm.sh".service = "http://127.0.0.1:${toString config.services.bluesky-pds.settings.PDS_PORT}";
+          };
           default = "http_status:404";
         };
       };

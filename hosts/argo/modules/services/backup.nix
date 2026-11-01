@@ -197,6 +197,17 @@ in
             "$install" -m 0755 ${home}/personal-agent/target/release/personal-agentd "$stage/personal-agent/"
           fi
 
+          # The xorwyrm.sh PDS: keys, blobs and everything else, then each SQLite
+          # database copied consistently while it keeps running.
+          if [[ -d /var/lib/pds ]]; then
+            sync_state /var/lib/pds "$stage/pds" --exclude='*.sqlite' --exclude='*.sqlite-wal' --exclude='*.sqlite-shm'
+            (cd /var/lib/pds && ${pkgs.findutils}/bin/find . -name '*.sqlite' -print0) |
+              while IFS= read -r -d "" db; do
+                "$install" -d -m 0700 "$stage/pds/$(${pkgs.coreutils}/bin/dirname "$db")"
+                "$sqlite3" "/var/lib/pds/$db" ".backup '$stage/pds/$db'"
+              done
+          fi
+
           # State whose live copy is safe or atomically replaced.
           sync_state /var/lib/tailscale "$stage/tailscale"
           sync_state /scratch/docker/volumes "$stage/docker-volumes"
