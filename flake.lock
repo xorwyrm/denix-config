@@ -409,18 +409,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1787132357,
-        "narHash": "sha256-o0guMM+2PhJZ7Q0vmdLyh6OV9pIdIIxZUNdjJ/npLPI=",
+        "lastModified": 1779479671,
+        "narHash": "sha256-8PR9nZnK0Fn4gDOikz+3sLdsEJYnKC3gaunBs4N+V9Q=",
         "ref": "refs/heads/main",
-        "rev": "b964ab9fe6de3a116fe788dc7226995beecb0a95",
-        "shallow": true,
+        "rev": "2e3744d31b990248f277d16a11ef81753b366f0f",
+        "revCount": 22,
         "type": "git",
-        "url": "https://knot1.tangled.sh/did:plc:wvqowqkngb3g6vwr6kssm7lg"
+        "url": "https://tangled.org/isabelroses.com/fetch-tangled"
       },
       "original": {
-        "shallow": true,
         "type": "git",
-        "url": "https://knot1.tangled.sh/did:plc:wvqowqkngb3g6vwr6kssm7lg"
+        "url": "https://tangled.org/isabelroses.com/fetch-tangled"
       }
     },
     "fish-git-abbr": {
@@ -2013,12 +2012,12 @@
         "rev": "c76eedefea33faeaccb9096dc307ded244463b6a",
         "shallow": true,
         "type": "git",
-        "url": "https://knot1.tangled.sh/did:plc:j5hmlfdrwkvtxm7cjmu7j2is"
+        "url": "https://tangled.org/did:plc:j5hmlfdrwkvtxm7cjmu7j2is"
       },
       "original": {
         "shallow": true,
         "type": "git",
-        "url": "https://knot1.tangled.sh/did:plc:j5hmlfdrwkvtxm7cjmu7j2is"
+        "url": "https://tangled.org/did:plc:j5hmlfdrwkvtxm7cjmu7j2is"
       }
     },
     "timeless-fonts-src": {
