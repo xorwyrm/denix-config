@@ -22,7 +22,6 @@ delib.module {
       bluesky-pds = {
         enable = true;
         pdsadmin.enable = true;
-        package = pkgs.bluesky-pds.override {nodejs_22 = pkgs.local.nodejs_22;};
         environmentFiles = [config.sops.secrets.bsky_pds.path];
 
         settings = {
