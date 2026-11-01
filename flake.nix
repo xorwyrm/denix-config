@@ -174,12 +174,26 @@
 
     # Tangled's own flake, for the knot on argo. Not following our nixpkgs:
     # its Rust build is pinned to the nixpkgs it's tested against. Shallow,
-    # since its full history is a ~90 MB clone. Its flake-compat (only for
-    # default.nix) is dropped: Tangled's lock carries a URL Nix 2.34 rejects
-    # as a mismatch when fetching it.
+    # since its full history is a ~90 MB clone, and straight from the knot
+    # that hosts it rather than through tangled.org's redirect; if Tangled
+    # moves the repository, switch back to tangled.org/did:plc:j5hmlfdrwkvtxm7cjmu7j2is.
+    #
+    # Inputs the knot doesn't build from are dropped, so they're never
+    # fetched: flake-compat (also, Tangled's lock carries a URL Nix 2.34
+    # rejects as a mismatch), the hydrant indexer and microvm. fetch-tangled
+    # is needed, so it too comes straight from its knot.
     tangled = {
-      url = "git+https://tangled.org/did:plc:j5hmlfdrwkvtxm7cjmu7j2is?shallow=1";
-      inputs.flake-compat.follows = "";
+      url = "git+https://knot1.tangled.sh/did:plc:j5hmlfdrwkvtxm7cjmu7j2is?shallow=1";
+      inputs = {
+        flake-compat.follows = "";
+        hydrant.follows = "";
+        hydrant-dev.follows = "";
+        microvm.follows = "";
+        fetch-tangled = {
+          url = "git+https://knot1.tangled.sh/did:plc:wvqowqkngb3g6vwr6kssm7lg?shallow=1";
+          inputs.nixpkgs.follows = "tangled/nixpkgs";
+        };
+      };
     };
 
     t3code-flake = {

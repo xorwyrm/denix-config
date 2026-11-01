@@ -409,17 +409,18 @@
         ]
       },
       "locked": {
-        "lastModified": 1779479671,
-        "narHash": "sha256-8PR9nZnK0Fn4gDOikz+3sLdsEJYnKC3gaunBs4N+V9Q=",
+        "lastModified": 1787132357,
+        "narHash": "sha256-o0guMM+2PhJZ7Q0vmdLyh6OV9pIdIIxZUNdjJ/npLPI=",
         "ref": "refs/heads/main",
-        "rev": "2e3744d31b990248f277d16a11ef81753b366f0f",
-        "revCount": 22,
+        "rev": "b964ab9fe6de3a116fe788dc7226995beecb0a95",
+        "shallow": true,
         "type": "git",
-        "url": "https://tangled.org/isabelroses.com/fetch-tangled"
+        "url": "https://knot1.tangled.sh/did:plc:wvqowqkngb3g6vwr6kssm7lg"
       },
       "original": {
+        "shallow": true,
         "type": "git",
-        "url": "https://tangled.org/isabelroses.com/fetch-tangled"
+        "url": "https://knot1.tangled.sh/did:plc:wvqowqkngb3g6vwr6kssm7lg"
       }
     },
     "fish-git-abbr": {
@@ -718,38 +719,6 @@
         "ref": "master",
         "repo": "home-manager",
         "type": "github"
-      }
-    },
-    "hydrant": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1792544679,
-        "narHash": "sha256-fm0cuIyHjJTSvleJyLbT4E5KugtanuysL/oMOnGhN3I=",
-        "ref": "refs/heads/main",
-        "rev": "0128352f6b73d26e7ffaa5a79446ef556e452617",
-        "revCount": 811,
-        "type": "git",
-        "url": "https://tangled.org/ptr.pet/hydrant"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://tangled.org/ptr.pet/hydrant"
-      }
-    },
-    "hydrant-dev": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1792544679,
-        "narHash": "sha256-fm0cuIyHjJTSvleJyLbT4E5KugtanuysL/oMOnGhN3I=",
-        "ref": "refs/heads/main",
-        "rev": "0128352f6b73d26e7ffaa5a79446ef556e452617",
-        "revCount": 811,
-        "type": "git",
-        "url": "https://tangled.org/ptr.pet/hydrant"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://tangled.org/ptr.pet/hydrant"
       }
     },
     "hyprcursor": {
@@ -1244,28 +1213,6 @@
       "original": {
         "owner": "nvzone",
         "repo": "menu",
-        "type": "github"
-      }
-    },
-    "microvm": {
-      "inputs": {
-        "nixpkgs": [
-          "tangled",
-          "nixpkgs"
-        ],
-        "spectrum": "spectrum"
-      },
-      "locked": {
-        "lastModified": 1779970379,
-        "narHash": "sha256-ZHsxoYXXnfJtMVh1/yY+1Eh9hHcPBhE28Qvinauh+BQ=",
-        "owner": "microvm-nix",
-        "repo": "microvm.nix",
-        "rev": "0d49083ba2d7419b22908ac392777c16df9a032e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "microvm-nix",
-        "repo": "microvm.nix",
         "type": "github"
       }
     },
@@ -1860,22 +1807,6 @@
         "type": "github"
       }
     },
-    "spectrum": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1778940603,
-        "narHash": "sha256-voSM8dZNlaOWN3kbYFky+FNY6fFQOEw0xF+ZMpZKkCQ=",
-        "ref": "refs/heads/main",
-        "rev": "367dd227f539267eae2b62770b4c17b88ac8c1f1",
-        "revCount": 1265,
-        "type": "git",
-        "url": "https://spectrum-os.org/git/spectrum"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://spectrum-os.org/git/spectrum"
-      }
-    },
     "sqlite-lib-src": {
       "flake": false,
       "locked": {
@@ -2065,11 +1996,11 @@
         "fetch-tangled": "fetch-tangled",
         "flake-compat": [],
         "gomod2nix": "gomod2nix",
-        "hydrant": "hydrant",
-        "hydrant-dev": "hydrant-dev",
+        "hydrant": [],
+        "hydrant-dev": [],
         "ibm-plex-mono-src": "ibm-plex-mono-src",
         "indigo": "indigo",
-        "microvm": "microvm",
+        "microvm": [],
         "nixpkgs": "nixpkgs_9",
         "nixpkgs-pds": "nixpkgs-pds",
         "sqlite-lib-src": "sqlite-lib-src",
@@ -2082,12 +2013,12 @@
         "rev": "c76eedefea33faeaccb9096dc307ded244463b6a",
         "shallow": true,
         "type": "git",
-        "url": "https://tangled.org/did:plc:j5hmlfdrwkvtxm7cjmu7j2is"
+        "url": "https://knot1.tangled.sh/did:plc:j5hmlfdrwkvtxm7cjmu7j2is"
       },
       "original": {
         "shallow": true,
         "type": "git",
-        "url": "https://tangled.org/did:plc:j5hmlfdrwkvtxm7cjmu7j2is"
+        "url": "https://knot1.tangled.sh/did:plc:j5hmlfdrwkvtxm7cjmu7j2is"
       }
     },
     "timeless-fonts-src": {
