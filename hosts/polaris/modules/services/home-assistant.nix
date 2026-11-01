@@ -91,6 +91,16 @@ delib.module {
             '';
             doCheck = false;
           });
+          # Two of fsspec 2026.7.0's own tests fail, which breaks the whole
+          # Home Assistant build. Drop once nixpkgs fixes fsspec.
+          fsspec = super.fsspec.overridePythonAttrs (old: {
+            disabledTests =
+              (old.disabledTests or [])
+              ++ [
+                "test_filecache_with_checks"
+                "test_expiry"
+              ];
+          });
         };
       };
       extraComponents = [
