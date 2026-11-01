@@ -12,7 +12,7 @@
       url = "github:NixOS/nixpkgs/659c15701f113dea6828bf1953d2b3dc44e34550";
       flake = false;
     };
-    nixvim.url = "github:bitflippr/nixvim-new";
+    nixvim.url = "github:xorwyrm/nixvim-new";
 
     bang-bang = {
       url = "github:oh-my-fish/plugin-bang-bang";
@@ -63,17 +63,17 @@
     };
 
     difftastic-src = {
-      url = "github:bitflippr/difftastic";
+      url = "github:xorwyrm/difftastic";
       flake = false;
     };
 
     draconisplusplus = {
-      url = "github:bitflippr/draconisplusplus-monorepo";
+      url = "github:xorwyrm/draconisplusplus-monorepo";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     draconisplusplus-plugin-lab = {
-      url = "github:bitflippr/draconisplusplus-plugin-lab";
+      url = "github:xorwyrm/draconisplusplus-plugin-lab";
       inputs = {
         draconisplusplus.follows = "draconisplusplus";
         nixpkgs.follows = "nixpkgs";
@@ -82,7 +82,7 @@
     };
 
     draconisplusplus-plugins = {
-      url = "github:bitflippr/draconisplusplus-plugins";
+      url = "github:xorwyrm/draconisplusplus-plugins";
       inputs = {
         draconisplusplus.follows = "draconisplusplus";
         nixpkgs.follows = "nixpkgs";
@@ -92,12 +92,12 @@
 
     # Private; fetched over HTTPS with the user's git credentials.
     fleetd = {
-      url = "git+https://github.com/bitflippr/fleetd";
+      url = "git+https://github.com/xorwyrm/fleetd";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     fish-git-abbr = {
-      url = "github:pupbrained/fish-git-abbr/patch-1";
+      url = "github:xorwyrm/fish-git-abbr/patch-1";
       flake = false;
     };
 
@@ -123,7 +123,7 @@
     };
 
     jellyfin-src = {
-      url = "github:bitflippr/jellyfin";
+      url = "github:xorwyrm/jellyfin";
       flake = false;
     };
 
@@ -163,7 +163,7 @@
     };
 
     snappy-switcher = {
-      url = "github:bitflippr/snappy-switcher/feature/window-previews";
+      url = "github:xorwyrm/snappy-switcher/feature/window-previews";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -202,7 +202,7 @@
     };
 
     trmnl-fleet = {
-      url = "github:bitflippr/trmnl-fleet";
+      url = "github:xorwyrm/trmnl-fleet";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

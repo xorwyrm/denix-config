@@ -272,13 +272,13 @@
       "locked": {
         "lastModified": 1773249415,
         "narHash": "sha256-/JGMX/K1II+Ib6nAo+qmKDP6kv5C2tK1s/++sU4gvmg=",
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "difftastic",
         "rev": "d45676da59a5356a5b2fa3bb475914552330ba84",
         "type": "github"
       },
       "original": {
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "difftastic",
         "type": "github"
       }
@@ -314,13 +314,13 @@
       "locked": {
         "lastModified": 1791423853,
         "narHash": "sha256-5sPmHXPhFTDDxFE7MuL80+EojvZ13e/tKZFsfqUoIN4=",
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "draconisplusplus-monorepo",
         "rev": "afb05018f8fcb0eb496c56f33479d1c279b0d594",
         "type": "github"
       },
       "original": {
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "draconisplusplus-monorepo",
         "type": "github"
       }
@@ -341,13 +341,13 @@
       "locked": {
         "lastModified": 1791424529,
         "narHash": "sha256-p79RUGqTwC8KTFVufdX1T5YD4Njqhm/cmi+jIDZSkM8=",
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "draconisplusplus-plugin-lab",
         "rev": "2b05d8ebf993f496719d98ec4f7cc0b83a9c0b67",
         "type": "github"
       },
       "original": {
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "draconisplusplus-plugin-lab",
         "type": "github"
       }
@@ -368,13 +368,13 @@
       "locked": {
         "lastModified": 1791424547,
         "narHash": "sha256-LSQZ6zm/pez/xN0oKpNm0icXG7K4+rr8g2vGD38XFuQ=",
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "draconisplusplus-plugins",
         "rev": "ddbecdb51d325caaab863801531515b01d3a77a7",
         "type": "github"
       },
       "original": {
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "draconisplusplus-plugins",
         "type": "github"
       }
@@ -427,13 +427,13 @@
       "locked": {
         "lastModified": 1723613412,
         "narHash": "sha256-8gxqYGN9XIlX1cZovX6r5zo8C8hOrsYIVN39oVGbWv0=",
-        "owner": "pupbrained",
+        "owner": "xorwyrm",
         "repo": "fish-git-abbr",
         "rev": "faa3d2581b800c45960e8cd5087ff09acb936b85",
         "type": "github"
       },
       "original": {
-        "owner": "pupbrained",
+        "owner": "xorwyrm",
         "ref": "patch-1",
         "repo": "fish-git-abbr",
         "type": "github"
@@ -648,11 +648,11 @@
         "rev": "21386b3d99bdaad51eed146473a5b1aed95c0f8d",
         "revCount": 79,
         "type": "git",
-        "url": "https://github.com/bitflippr/fleetd"
+        "url": "https://github.com/xorwyrm/fleetd"
       },
       "original": {
         "type": "git",
-        "url": "https://github.com/bitflippr/fleetd"
+        "url": "https://github.com/xorwyrm/fleetd"
       }
     },
     "gitignore": {
@@ -1111,13 +1111,13 @@
       "locked": {
         "lastModified": 1791147751,
         "narHash": "sha256-bL+c7Wt5Hn2rAomTZFQa4FjVSliRCNs4bC1TUca3EyU=",
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "jellyfin",
         "rev": "1251c230b1b3f19ce5e674d9a4e794a613a152e9",
         "type": "github"
       },
       "original": {
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "jellyfin",
         "type": "github"
       }
@@ -1538,13 +1538,13 @@
       "locked": {
         "lastModified": 1770496258,
         "narHash": "sha256-ujuKhyl8yXKSmLuk2T3o8jD3D11hs1BnGyoiMvpphvA=",
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "nixvim-new",
         "rev": "975db84b33080991ce509691a0d768427e2b7286",
         "type": "github"
       },
       "original": {
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "nixvim-new",
         "type": "github"
       }
@@ -1774,13 +1774,13 @@
       "locked": {
         "lastModified": 1785099646,
         "narHash": "sha256-LOS/iqZ3XZ8omrC7O4QcSX5pe8R7YL+X211G4zwug5g=",
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "snappy-switcher",
         "rev": "7b779cb5fdf983b8cceb8eb1eb06446c2d699656",
         "type": "github"
       },
       "original": {
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "ref": "feature/window-previews",
         "repo": "snappy-switcher",
         "type": "github"
@@ -2098,13 +2098,13 @@
       "locked": {
         "lastModified": 1790473999,
         "narHash": "sha256-9j+sPUJlQQT1QUVyhIz3JSerEClrTRj0Oiuu2h2k6Vc=",
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "trmnl-fleet",
         "rev": "bb7a42208814040c964774edd79e2fb474041fcc",
         "type": "github"
       },
       "original": {
-        "owner": "bitflippr",
+        "owner": "xorwyrm",
         "repo": "trmnl-fleet",
         "type": "github"
       }
