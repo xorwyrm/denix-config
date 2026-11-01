@@ -3,18 +3,19 @@
   delib,
   ...
 }: let
-  hostname = "knot.skulldogged.dev";
+  hostname = "knot.xorwyrm.sh";
   # Locally managed tunnel "argo-knot"; its credentials are in argo-knot.yaml.
   tunnelId = "6354bdcd-529a-42ca-8b46-1b17d57eb1ac";
   stateDir = config.services.tangled.knot-rs.stateDir;
 in
-  # Mars's Tangled knot (https://tangled.org), holding their git repositories;
-  # tangled.org's web app shows them. Its state is the btrfs subvolume mounted
-  # at /var/lib/knot (hardware.nix), backed up hourly (backup.nix).
+  # The Tangled knot (https://tangled.org) for Mars's xorwyrm.sh identity,
+  # holding its git repositories; tangled.org's web app shows them. Its state
+  # is the btrfs subvolume mounted at /var/lib/knot (hardware.nix), backed up
+  # hourly (backup.nix).
   #
   # Public 443 belongs to Stalwart, so HTTPS comes in through a Cloudflare
   # Tunnel instead. SSH (2222) is reachable over Tailscale only: the tunnel
-  # can't carry it, so the git@knot.skulldogged.dev URLs tangled.org shows
+  # can't carry it, so the git@knot.xorwyrm.sh URLs tangled.org shows
   # don't work, and Mars pushes to builder.skate-altair.ts.net:2222 instead.
   delib.module {
     name = "argo";
@@ -36,10 +37,10 @@ in
         settings = {
           server = {
             inherit hostname;
-            admins = ["did:plc:rxomii4zl7qpyu4mryugyrkh"]; # skulldogged.dev
+            admins = ["did:plc:htuqa7pmfgournou327vytkd"]; # xorwyrm.sh, on pds.xorwyrm.sh
           };
           atproto.plc_directory = "https://plc.directory";
-          contact.email = "admin@skulldogged.dev";
+          contact.email = "hi@xorwyrm.sh";
 
           # SHA-1, so repositories can be mirrored to and from GitHub.
           git.object_format = "sha1";

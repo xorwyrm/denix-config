@@ -66,7 +66,7 @@ delib.module {
           "This is NixOS: get tools with `nix shell nixpkgs#<pkg>` or `nix run`, never apt. System changes go in denix-config (hosts/argo), checked out at ~/Projects/denix-config."
           "Remove files with `rip`, not rm."
           "Stalwart serves mail for skulldogged.dev here. Don't stop or reconfigure it unless the task is about mail."
-          "Mars's Tangled knot (knot-rs.service, data in /var/lib/knot) serves their git repositories at knot.skulldogged.dev through a Cloudflare Tunnel; SSH pushes go to builder.skate-altair.ts.net:2222. Don't stop it or touch /var/lib/knot unless the task is about it."
+          "Mars's xorwyrm.sh identity runs here: its Tangled knot (knot-rs.service, data in /var/lib/knot) at knot.xorwyrm.sh and its PDS (bluesky-pds.service, data in /var/lib/pds) at pds.xorwyrm.sh, both through the argo-knot Cloudflare Tunnel; knot SSH pushes go to builder.skate-altair.ts.net:2222. Keep it separate from skulldogged.dev, and don't stop either service or touch their data unless the task is about them."
         ];
 
         paths = {
