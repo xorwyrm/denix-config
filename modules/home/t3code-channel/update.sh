@@ -348,11 +348,18 @@ fi
 
 version="$(node "$script_dir/release-version.mjs" "$nightly_tag" "$(git -C "$source_repo" tag --list 'personal-v*')")"
 workflow_inputs_file="$state_dir/workflow-inputs.json"
+# Canis is a laptop and is often off. Its iOS and macOS arm64 jobs would queue
+# forever with no online runner, so build them on GitHub's macOS runner then.
+ios_runner="canis-ios"
+if ! gh api "repos/${fork_repo}/actions/runners" --jq '.runners[] | select(.status == "online" and any(.labels[]; .name == "canis-ios")) | .name' | grep -q .; then
+  ios_runner="macos-26"
+  log "The canis runner is offline; building the iOS app and macOS arm64 CLI on GitHub's ${ios_runner}."
+fi
 node -e '
   const fs = require("node:fs");
-  const [output, version, expectedSha, mainSha, overlays] = process.argv.slice(1);
-  fs.writeFileSync(output, `${JSON.stringify({version, expected_sha: expectedSha, source_manifest: JSON.stringify({mainSha, overlays: JSON.parse(overlays)})})}\n`, {mode: 0o600});
-' "$workflow_inputs_file" "$version" "$integration_sha" "$main_sha" "$overlay_shas_json"
+  const [output, version, expectedSha, mainSha, overlays, iosRunner] = process.argv.slice(1);
+  fs.writeFileSync(output, `${JSON.stringify({version, expected_sha: expectedSha, source_manifest: JSON.stringify({mainSha, overlays: JSON.parse(overlays)}), ios_runner: iosRunner})}\n`, {mode: 0o600});
+' "$workflow_inputs_file" "$version" "$integration_sha" "$main_sha" "$overlay_shas_json" "$ios_runner"
 
 log "Publishing integration ${integration_sha:0:12} as ${version}."
 if [[ "${T3CODE_CHANNEL_DRY_RUN:-0}" == "1" ]]; then
