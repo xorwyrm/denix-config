@@ -141,15 +141,37 @@ deploy_canis() {
     -o ServerAliveCountMax=2
   )
 
+  # Canis runs either the npm package under node (the plist's first argument is
+  # node) or the standalone launcher build in ~/.t3/runtime/versions (the plist
+  # runs that build's t3 directly). Install whichever it runs now.
+  local canis_first canis_mode canis_package
+  canis_first="$(ssh "${ssh_options[@]}" "$canis_host" \
+    "/usr/libexec/PlistBuddy -c 'Print :ProgramArguments:0' \"\$HOME/Library/LaunchAgents/codes.t3.server.plist\"")" || return $?
+  if [[ "$canis_first" == */.t3/runtime/versions/*/t3 ]]; then
+    canis_mode=launcher
+    canis_package="$release_dir/t3-${version}-darwin-arm64.tar.gz"
+    [[ -f "$canis_package" ]] || { log "Missing macOS runtime archive"; return 1; }
+  else
+    canis_mode=node
+    canis_package="$server_tgz"
+  fi
+
   ssh "${ssh_options[@]}" "$canis_host" "mkdir -p '$canis_cache' && chmod -R u+w '$canis_cache'" || return $?
-  scp "${ssh_options[@]}" "$server_tgz" "$script_dir/active-database.mjs" "$canis_host:$canis_cache/" || return $?
+  scp "${ssh_options[@]}" "$canis_package" "$script_dir/active-database.mjs" "$canis_host:$canis_cache/" || return $?
   ssh "${ssh_options[@]}" "$canis_host" bash -s -- \
-    "$version" "$canis_cache/$(basename "$server_tgz")" "$canis_cache/active-database.mjs" <<'CANIS'
+    "$version" "$canis_cache/$(basename "$canis_package")" "$canis_cache/active-database.mjs" "$canis_mode" <<'CANIS'
 set -euo pipefail
 version="$1"
 server_tgz="$2"
 active_database_script="$3"
-install_root="$HOME/.local/share/t3code"
+mode="$4"
+if [[ "$mode" == launcher ]]; then
+  install_root="$HOME/.t3/runtime/versions"
+  entry_index=0
+else
+  install_root="$HOME/.local/share/t3code"
+  entry_index=1
+fi
 target_dir="$install_root/$version"
 plist="$HOME/Library/LaunchAgents/codes.t3.server.plist"
 backup="$plist.before-$version"
@@ -158,9 +180,20 @@ database_backup="${backup}.database"
 node_bin="/opt/homebrew/opt/node@24/bin/node"
 npm_bin="/opt/homebrew/opt/node@24/bin/npm"
 export PATH="/opt/homebrew/opt/node@24/bin:$PATH"
-entry="$target_dir/node_modules/t3/dist/bin.mjs"
+if [[ "$mode" == launcher ]]; then
+  entry="$target_dir/t3"
+else
+  entry="$target_dir/node_modules/t3/dist/bin.mjs"
+fi
 
-if [[ ! -f "$target_dir/.install-complete" ]] || [[ "$(<"$target_dir/.install-complete")" != "$version" ]]; then
+if [[ "$mode" == launcher ]]; then
+  if [[ ! -x "$entry" || ! -f "$target_dir/.install-complete" ]] || [[ "$(<"$target_dir/.install-complete")" != "$version" ]]; then
+    mkdir -p "$target_dir"
+    tar -xzf "$server_tgz" -C "$target_dir" --strip-components=1
+    [[ "$(env -u T3_SERVICE_LAUNCHER_CONTEXT "$entry" --version)" == "t3 v$version" ]]
+    printf '%s\n' "$version" > "$target_dir/.install-complete"
+  fi
+elif [[ ! -f "$target_dir/.install-complete" ]] || [[ "$(<"$target_dir/.install-complete")" != "$version" ]]; then
   mkdir -p "$target_dir"
   "$node_bin" -e 'const fs=require("node:fs"); fs.writeFileSync(process.argv[1], JSON.stringify({private:true}, null, 2)+"\n")' "$target_dir/package.json"
   "$npm_bin" install --prefix "$target_dir" --omit=dev --no-audit --no-fund "$server_tgz"
@@ -179,14 +212,14 @@ NODE_PTY_HELPER
   printf '%s\n' "$version" > "$target_dir/.install-complete"
 fi
 
-current_entry="$(/usr/libexec/PlistBuddy -c 'Print :ProgramArguments:1' "$plist")"
+current_entry="$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:$entry_index" "$plist")"
 if [[ "$current_entry" == "$entry" ]]; then
   exit 0
 fi
 
 database="$(node "$active_database_script" "$database")"
 cp "$plist" "$backup"
-/usr/libexec/PlistBuddy -c "Set :ProgramArguments:1 $entry" "$plist"
+/usr/libexec/PlistBuddy -c "Set :ProgramArguments:$entry_index $entry" "$plist"
 if ! launchctl bootout "gui/$(id -u)/codes.t3.server"; then
   cp "$backup" "$plist"
   echo "Could not stop the existing server; leaving its database untouched." >&2
@@ -222,13 +255,22 @@ restore_old() {
 # database copy.
 prune() {
   local previous linked dir copy
-  previous="$(/usr/libexec/PlistBuddy -c 'Print :ProgramArguments:1' "$backup")"
+  previous="$(/usr/libexec/PlistBuddy -c "Print :ProgramArguments:$entry_index" "$backup" || true)"
   linked="$(readlink "$HOME/.local/bin/t3" || true)"
   for dir in "$install_root"/[0-9]*/; do
     dir="${dir%/}"
     [[ "$dir" == "$target_dir" || "$previous" == "$dir"/* || "$linked" == "$dir"/* ]] && continue
     rm -rf "$dir" || echo "Could not remove $dir" >&2
   done
+  # Installs from the other layout are no longer used; keep only the one
+  # ~/.local/bin/t3 links to.
+  if [[ "$mode" == launcher ]]; then
+    for dir in "$HOME/.local/share/t3code"/[0-9]*/; do
+      dir="${dir%/}"
+      [[ "$linked" == "$dir"/* ]] && continue
+      rm -rf "$dir" || echo "Could not remove $dir" >&2
+    done
+  fi
   for copy in "$plist".before-*.database.*; do
     [[ "$copy" == "$database_backup" ]] || rm -rf "$copy" || echo "Could not remove $copy" >&2
   done
