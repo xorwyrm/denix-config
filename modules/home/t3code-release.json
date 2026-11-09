@@ -1,6 +1,6 @@
 {
-  "version": "0.1.8-nightly.20261109.4399.personal.4",
-  "appImageHash": "sha256-jBJHmJCuvrCKAiKdJdro9+o6bjks6Ep33CznTgCYbm8=",
+  "version": "0.1.8-nightly.20261109.4399.personal.5",
+  "appImageHash": "sha256-pYL+qrHfVq4PTOSQ07gDh84bjvxKgvKFaZs1DuJqi24=",
   "repository": "skulldorged/t3code",
   "tagPrefix": "personal-v"
 }
