@@ -49,8 +49,7 @@ delib.module {
         };
 
         mounts = {
-          "/" = "btrfs on LUKS on the Samsung NVMe: system, Nix store, home; nearly full. The root subvolume, /scratch included, is recreated empty at every boot";
-          "/mnt/Shared" = "NTFS partition shared with this PC's Windows install (Steam library and more)";
+          "/" = "btrfs on LUKS on the Samsung NVMe: system, Nix store, home. The root subvolume, /scratch included, is recreated empty at every boot";
           "/mnt/Music" = "Polaris's music share over SMB";
         };
 

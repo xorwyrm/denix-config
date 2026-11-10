@@ -92,18 +92,6 @@ delib.module {
         ];
       };
 
-      "/mnt/Shared" = {
-        device = "/dev/disk/by-uuid/00AFAB5C797254C7";
-        fsType = "ntfs";
-        options = [
-          "rw"
-          "uid=1000"
-          "gid=1000"
-          "umask=007"
-          "nofail"
-        ];
-      };
-
       "/mnt/Music" = {
         device = "//192.168.1.82/music";
         fsType = "cifs";
