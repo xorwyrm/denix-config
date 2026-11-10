@@ -11,6 +11,10 @@
     src = inputs.difftastic-src;
     cargoHash = "sha256-sJv1y1vs5XhixOMgEf9qchMFhKsJXErdWQN91BPMO7s=";
 
+    # nixpkgs' cargo setup links jemalloc from the system, as its own
+    # difftastic package does.
+    buildInputs = [pkgs.rust-jemalloc-sys];
+
     env = pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isStatic {
       RUSTFLAGS = "-C relocation-model=static";
     };

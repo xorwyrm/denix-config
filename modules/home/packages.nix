@@ -79,7 +79,11 @@ delib.module {
         duf
         equibop
         glow
-        jellyfin-tui
+        # nixpkgs' Rust builds now link system sqlite; jellyfin-tui lacks it
+        # until NixOS/nixpkgs master's fix reaches nixos-unstable.
+        (jellyfin-tui.overrideAttrs (old: {
+          buildInputs = old.buildInputs ++ [sqlite];
+        }))
         killall
         libnotify
         lm_sensors
