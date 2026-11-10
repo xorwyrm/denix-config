@@ -22,9 +22,9 @@ delib.module {
       argo = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINmHB1IqZ2XbtRnxyXL7uAnuFB1e8dhGhBlHTTFL0IKU fleet-builder";
       polaris = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGEtGBP9oDI1KcX1ZPh/QL/7TJzykmRN4zB3KljtG8BP fleet-polaris";
       canis = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICCjjPRNWczwWtChAMOGLYHKTRvmhw1pNvy29b36hifi fleet-canis";
-      # The laptop's macOS install.
+      # The desktop's macOS install.
       vela = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJLJdiKCr/5zw4CRfii4c6qiNQ40dLIhJxdtYXXcSIFe fleet-vela";
-      # The laptop's NixOS install.
+      # The desktop's NixOS install.
       navis = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILXHezNopXrrVepuwOW9DUV5brv1bDmXftCwCgQl8DZ/ fleet-navis";
     });
 

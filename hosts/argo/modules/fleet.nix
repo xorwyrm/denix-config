@@ -87,24 +87,23 @@ delib.module {
 
         delegate = {
           "Windows-native builds and GUI runs (WinUI, MSVC)" = "Polaris's win11 Incus VM";
-          "Checks that need Mars's laptop hardware (RTX 3050, ASUS drivers)" = "vela, the laptop's macOS, while it's booted (`fleet wait vela`); otherwise ask Mars";
-          "fastboot, recovery and other USB-only phone work" = "the laptop, where the phone's cable plugs in: ask Mars";
+          "Checks that need Mars's desktop hardware (RTX 5060)" = "navis, the desktop's NixOS, while it's booted (`fleet wait navis`); it's Mars's daily machine, so ask first";
+          "fastboot, recovery and other USB-only phone work" = "Mars's desktop PC, where the phone's cable plugs in: ask Mars";
           "Apple builds, iOS Simulator, iPad and macOS GUI work" = "canis (`ssh canis`)";
           "Polaris's homelab services and config" = "Polaris (`ssh polaris`); its config is denix-config hosts/polaris";
-          "GPU work beyond argo's small Radeon iGPU" = "Polaris (or the laptop, through Mars)";
+          "GPU work beyond argo's small Radeon iGPU" = "Polaris (or the desktop, through Mars)";
         };
 
         peers = {
           polaris = "NixOS home server: homelab services, GPU, Windows VM";
-          desktop-1od2lvu = "Mars's Windows laptop and daily desktop; agents here can't reach it (it accepts no agent keys), so ask Mars, who can run it from T3 on the laptop";
           canis = "Mars's MacBook Air (macOS)";
           pixel-10-pro-xl = "Mars's phone: adb over Tailscale, and T3 runs on it";
-          navis = "the laptop's NixOS install; online only when booted";
-          vela = "the laptop's macOS install (Intel, RTX 3050): Intel macOS builds and NVIDIA driver work; online only when booted";
+          navis = "Mars's desktop PC (Ryzen 5 8400F, RTX 5060) booted as NixOS, their daily machine; online only when booted";
+          vela = "the same desktop booted as macOS (OpenCore, NullMoth NVIDIA driver), not yet checked on the desktop; online only when booted";
         };
 
-        # The laptop boots as one of these at a time.
-        machines.laptop = ["desktop-1od2lvu" "navis" "vela"];
+        # The desktop boots as one of these at a time.
+        machines.desktop = ["navis" "vela"];
 
         # `fleet job run` refuses new jobs below these, so a runaway build can't
         # fill the mirror that holds the system and mail.
@@ -124,7 +123,7 @@ delib.module {
           serial = "57150DLCQ002Y1";
           model = "Pixel 10 Pro XL";
           tailscale = "pixel-10-pro-xl";
-          cable_host = "the laptop (desktop-1od2lvu)";
+          cable_host = "Mars's desktop PC";
           notes = "Mars's daily phone: stock Android 17 with KernelSU root. Reboot it or change its settings only when the task calls for it.";
         };
 

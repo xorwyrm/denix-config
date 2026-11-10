@@ -65,20 +65,19 @@ delib.module {
         delegate = {
           "Most agent work, Android, desktops and the phone" = "argo (`ssh argo`; Tailscale name builder)";
           "Apple builds, iOS Simulator, iPad and macOS GUI work" = "canis (`ssh canis`)";
-          "Windows-native builds and GUI runs" = "the win11 Incus VM here (agents can't reach the laptop)";
+          "Windows-native builds and GUI runs" = "the win11 Incus VM here";
         };
 
         peers = {
           builder = "argo, Mars's main agent machine (Tailscale name builder)";
-          desktop-1od2lvu = "Mars's Windows laptop and daily desktop; agents here can't reach it (it accepts no agent keys), so ask Mars, who can run it from T3 on the laptop";
           canis = "Mars's MacBook Air (macOS)";
           pixel-10-pro-xl = "Mars's phone; argo holds its adb";
-          navis = "the laptop's NixOS install; online only when booted";
-          vela = "the laptop's macOS install (Intel, RTX 3050); online only when booted";
+          navis = "Mars's desktop PC (Ryzen 5 8400F, RTX 5060) booted as NixOS, their daily machine; online only when booted";
+          vela = "the same desktop booted as macOS (OpenCore, NullMoth NVIDIA driver), not yet checked on the desktop; online only when booted";
         };
 
-        # The laptop boots as one of these at a time.
-        machines.laptop = ["desktop-1od2lvu" "navis" "vela"];
+        # The desktop boots as one of these at a time.
+        machines.desktop = ["navis" "vela"];
 
         notes = [
           "Fleet notes for this host: ~/Projects/agent-fleet/machines/polaris.md."

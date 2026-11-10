@@ -49,8 +49,8 @@ delib.module {
         };
 
         mounts = {
-          "/" = "btrfs on LUKS on the Samsung NVMe: system, Nix store, home; nearly full";
-          "/mnt/Shared" = "partition shared with the laptop's Windows install (Steam library and more)";
+          "/" = "btrfs on LUKS on the Samsung NVMe: system, Nix store, home; nearly full. The root subvolume, /scratch included, is recreated empty at every boot";
+          "/mnt/Shared" = "NTFS partition shared with this PC's Windows install (Steam library and more)";
           "/mnt/Music" = "Polaris's music share over SMB";
         };
 
@@ -75,12 +75,11 @@ delib.module {
           polaris = "Mars's home server: the homelab and the win11 Incus VM";
           canis = "Mars's MacBook Air (macOS)";
           pixel-10-pro-xl = "Mars's phone; argo holds its adb";
-          desktop-1od2lvu = "this same laptop booted as Windows; never online alongside navis";
-          vela = "this same laptop booted as macOS; never online alongside navis";
+          vela = "this same desktop booted as macOS; never online alongside navis";
         };
 
-        # The laptop boots as one of these at a time.
-        machines.laptop = ["desktop-1od2lvu" "navis" "vela"];
+        # The desktop boots as one of these at a time.
+        machines.desktop = ["navis" "vela"];
 
         notes = [
           "Fleet notes for this host: ~/Projects/agent-fleet/machines/navis.md on argo."
