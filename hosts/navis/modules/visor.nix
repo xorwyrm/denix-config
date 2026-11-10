@@ -190,6 +190,31 @@
       fi
       chmod 0644 "$efi_tmp"
 
+      # vela's OpenCore boots with Secure Boot on: the firmware checks it
+      # and its drivers against this db key, then its DisableSecurityPolicy
+      # quirk lets macOS's own (unsigned) boot.efi load. Re-sign whatever
+      # doesn't verify, so an OpenCore update stays bootable.
+      if ((sign)) && [[ -f "$esp/EFI/OC/OpenCore.efi" ]]; then
+        for image in "$esp/EFI/OC/OpenCore.efi" "$esp"/EFI/OC/Drivers/*.efi; do
+          [[ -f "$image" ]] || continue
+          if sbverify \
+            --cert ${lib.escapeShellArg (toString config.boot.lanzaboote.publicKeyFile)} \
+            "$image" >/dev/null 2>&1; then
+            continue
+          fi
+
+          signed_tmp="$(mktemp "$image.XXXXXX")"
+          sbsign \
+            --key ${lib.escapeShellArg (toString config.boot.lanzaboote.privateKeyFile)} \
+            --cert ${lib.escapeShellArg (toString config.boot.lanzaboote.publicKeyFile)} \
+            --output "$signed_tmp" \
+            "$image"
+          chmod 0644 "$signed_tmp"
+          mv -f "$signed_tmp" "$image"
+          echo "navis-visor-sync: signed ''${image#"$esp"}"
+        done
+      fi
+
       install -m0644 ${visorConfigHeader} "$config_tmp"
 
       append_nixos_entry() {
@@ -232,6 +257,20 @@
           icon = \EFI\visor\icons\windows.png
           color = 89B4FA
           kernel = \EFI\Microsoft\Boot\bootmgfw.efi
+      }
+      EOF
+      fi
+
+      # vela, the macOS install on this disk, boots through OpenCore. Its
+      # LauncherOption is Disabled, so this entry is the way in.
+      if [[ -f "$esp/EFI/OC/OpenCore.efi" ]]; then
+        cat >>"$config_tmp" <<'EOF'
+
+      entry {
+          name = "macOS"
+          icon = \EFI\visor\icons\unknown.png
+          color = CBA6F7
+          kernel = \EFI\OC\OpenCore.efi
       }
       EOF
       fi
