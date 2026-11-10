@@ -19,11 +19,9 @@ delib.module {
         pkiBundle = "/var/lib/sbctl";
         # Leave space on the 549 MiB ESP to stage the next kernel and initrd.
         configurationLimit = 2;
-        autoEnrollKeys = {
-          enable = true;
-          includeMicrosoftKeys = true;
-        };
-        settings.timeout = 0;
+        # The keys are enrolled, and auto-enrollment needs systemd-boot,
+        # which navis doesn't keep: Visor is its only boot manager.
+        autoEnrollKeys.enable = false;
       };
 
       initrd = {

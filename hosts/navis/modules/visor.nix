@@ -9,6 +9,9 @@
   expectedEspDevice = config.fileSystems.${espMountPoint}.device;
   visorBootManager = pkgs.local.visor-bootmanager;
   visorBackground = ../assets/visor/shiny-espeon.gif;
+  # The desktop's Windows lives on the other NVMe (nvme0n1) with its own ESP;
+  # Visor chainloads its bootmgfw.efi from that partition by PARTUUID.
+  windowsEspPartUuid = "81155795-e3ba-45fe-bc06-c3ffa4e404a2";
   visorNixosIcon = pkgs.runCommand "visor-nixos-icon.png" {nativeBuildInputs = [pkgs.imagemagick];} ''
     magick \
       ${pkgs.nixos-icons}/share/icons/hicolor/128x128/apps/nix-snowflake.png \
@@ -32,6 +35,29 @@
       PNG32:$out
   '';
 
+  # Visor ships no Apple icon: render Simple Icons' Apple logo (CC0) in the
+  # menu's light text color, sized like the Windows icon.
+  appleLogo = pkgs.fetchurl {
+    url = "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/apple.svg";
+    hash = "sha256-KhUJ3M0l5tK8ehGo5SlBB34aSFVeGSzmOGmbnwg8Knw=";
+  };
+  visorMacosIcon = pkgs.runCommand "visor-macos-icon.png" {nativeBuildInputs = [pkgs.imagemagick pkgs.librsvg];} ''
+    rsvg-convert --height 448 ${appleLogo} --output logo.png
+    magick logo.png \
+      -trim \
+      +repage \
+      -resize '112x112' \
+      -channel RGB \
+      -fill '#CDD6F4' \
+      -colorize 100% \
+      +channel \
+      -background none \
+      -gravity center \
+      -extent 128x128 \
+      -depth 8 \
+      PNG32:$out
+  '';
+
   visorConfigHeader = pkgs.writeText "navis-visor-boot.conf" ''
     timeout=10
     default=0
@@ -45,12 +71,15 @@
     recovery_entries=0
     snapshots=0
 
-    resolution=native
+    # The GOP starts in 1920x1080; switch to the monitor's native mode (it
+    # keeps the current mode if the firmware doesn't offer this one).
+    resolution=2560x1440
     title=none
     logo=none
     show_names=1
     center_info=0
-    entries_per_page=2
+    # NixOS, Windows and macOS on the first page; older generations after.
+    entries_per_page=3
     box_radius=14
     mouse=1
     font=maple
@@ -163,6 +192,7 @@
       done
       install -m0644 ${visorNixosIcon} "$visor_dir/icons/nixos.png"
       install -m0644 ${visorWindowsIcon} "$visor_dir/icons/windows.png"
+      install -m0644 ${visorMacosIcon} "$visor_dir/icons/macos.png"
       for asset in ${visorBootManager}/share/visor/backgrounds/*.png; do
         install -m0644 "$asset" "$visor_dir/backgrounds/$(basename "$asset")"
       done
@@ -215,6 +245,16 @@
         done
       fi
 
+      # Visor is the only boot manager: drop the systemd-boot copies that
+      # Lanzaboote installs on every run, and make the removable-media
+      # fallback path boot Visor too, in case the firmware loses its entry.
+      rm -rf "$esp/EFI/systemd"
+      rm -f "$esp/loader/loader.conf"
+      install -d -m0755 "$esp/EFI/BOOT"
+      fallback_tmp="$(mktemp "$esp/EFI/BOOT/.BOOTX64.EFI.XXXXXX")"
+      install -m0644 "$efi_tmp" "$fallback_tmp"
+      mv -f "$fallback_tmp" "$esp/EFI/BOOT/BOOTX64.EFI"
+
       install -m0644 ${visorConfigHeader} "$config_tmp"
 
       append_nixos_entry() {
@@ -249,17 +289,16 @@
       generated=0
       append_nixos_entry "''${ukis[0]}" 1
 
-      if [[ -f "$esp/EFI/Microsoft/Boot/bootmgfw.efi" ]]; then
-        cat >>"$config_tmp" <<'EOF'
+      cat >>"$config_tmp" <<'EOF'
 
       entry {
           name = "Windows"
           icon = \EFI\visor\icons\windows.png
           color = 89B4FA
           kernel = \EFI\Microsoft\Boot\bootmgfw.efi
+          uuid = ${windowsEspPartUuid}
       }
       EOF
-      fi
 
       # vela, the macOS install on this disk, boots through OpenCore. Its
       # LauncherOption is Disabled, so this entry is the way in.
@@ -268,7 +307,7 @@
 
       entry {
           name = "macOS"
-          icon = \EFI\visor\icons\unknown.png
+          icon = \EFI\visor\icons\macos.png
           color = CBA6F7
           kernel = \EFI\OC\OpenCore.efi
       }
@@ -284,24 +323,20 @@
         exit 1
       }
 
-      if [[ -f "$esp/EFI/systemd/systemd-bootx64.efi" ]]; then
-        cat >>"$config_tmp" <<'EOF'
-
-      entry {
-          name = "systemd-boot fallback"
-          icon = \EFI\visor\icons\linux.png
-          color = F9E2AF
-          kernel = \EFI\systemd\systemd-bootx64.efi
-      }
-      EOF
-      fi
-
       mv -f "$efi_tmp" "$visor_dir/visor_x64.efi"
       mv -f "$config_tmp" "$visor_dir/boot.conf"
       [[ -e "$visor_dir/boot.log" ]] || install -m0644 /dev/null "$visor_dir/boot.log"
       sync -f "$esp"
 
       if ((sign)); then
+        # Remove firmware entries that still start systemd-boot.
+        while IFS= read -r line; do
+          if [[ "''${line,,}" =~ ^boot([0-9a-f]{4})[*]?[[:space:]].*'\efi\systemd\systemd-bootx64.efi' ]]; then
+            efibootmgr --quiet --bootnum "''${BASH_REMATCH[1]}" --delete-bootnum
+            echo "navis-visor-sync: removed systemd-boot firmware entry Boot''${BASH_REMATCH[1]^^}"
+          fi
+        done < <(efibootmgr -v)
+
         efi_state="$(efibootmgr)"
         visor_id=""
 
@@ -381,6 +416,10 @@
       set -euo pipefail
 
       # Lanzaboote remains responsible for synthesizing and signing the UKIs.
+      # It also insists on installing systemd-boot, which visorSync removes
+      # again. Drop Visor's fallback copy first, so Lanzaboote doesn't warn
+      # that BOOTX64.EFI isn't systemd-boot.
+      rm -f ${lib.escapeShellArg "${espMountPoint}/EFI/BOOT/BOOTX64.EFI"}
       PATH=${config.systemd.package}/lib/systemd:$PATH
       ${config.boot.lanzaboote.installCommand} \
         ${lib.escapeShellArg "--public-key=${toString config.boot.lanzaboote.publicKeyFile}"} \
