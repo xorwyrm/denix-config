@@ -9,10 +9,6 @@ delib.module {
 
   home.ifEnabled.wayland.windowManager.hyprland.settings.monitor = lib.mkForce [
     {
-      output = "eDP-1";
-      disabled = true;
-    }
-    {
       output = "desc:LG Electronics LG ULTRAGEAR 411BOYQ05442";
       mode = "2560x1440@180";
       position = "0x0";

@@ -14,11 +14,16 @@ delib.module {
       description
       (strOption "")
       "VA-API device used for copy-back hardware video decoding. Empty disables hardware decoding.";
+
+    nvdec =
+      description
+      (boolOption false)
+      "Use NVDEC copy-back hardware decoding on an NVIDIA GPU instead of VA-API.";
   };
 
   home.ifEnabled = {myconfig, ...}: let
     cfg = myconfig.programs.mpv;
-    hardwareDecodeEnabled = cfg.hardwareDecodeDevice != "";
+    hardwareDecodeEnabled = !cfg.nvdec && cfg.hardwareDecodeDevice != "";
   in {
     programs.mpv = {
       enable = true;
@@ -28,10 +33,14 @@ delib.module {
         "iHD"
       ];
       scripts = [pkgs.mpvScripts.uosc];
-      config = lib.optionalAttrs hardwareDecodeEnabled {
-        hwdec = "vaapi-copy";
-        vaapi-device = cfg.hardwareDecodeDevice;
-      };
+      config =
+        lib.optionalAttrs hardwareDecodeEnabled {
+          hwdec = "vaapi-copy";
+          vaapi-device = cfg.hardwareDecodeDevice;
+        }
+        // lib.optionalAttrs cfg.nvdec {
+          hwdec = "nvdec-copy";
+        };
     };
   };
 }

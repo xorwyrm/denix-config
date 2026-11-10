@@ -28,7 +28,7 @@ delib.module {
       };
 
       host = {
-        role = "Mars's laptop booted as NixOS (Hyprland desktop), and their daily machine while it's up. It's online only when the laptop is booted into navis, not Windows or vela. Most agent work runs on argo; work here when it needs this desktop, the laptop's hardware or files on it.";
+        role = "Mars's desktop PC (Ryzen 5 8400F, RTX 5060) booted as NixOS (Hyprland desktop), and their daily machine while it's up. It's online only while the PC is booted into navis. Most agent work runs on argo; work here when it needs this desktop, its hardware or files on it.";
         owner = "Mars (they/them)";
 
         conventions = [
@@ -49,7 +49,7 @@ delib.module {
         };
 
         mounts = {
-          "/" = "btrfs on LUKS on the laptop's NVMe: system, Nix store, home; nearly full";
+          "/" = "btrfs on LUKS on the Samsung NVMe: system, Nix store, home; nearly full";
           "/mnt/Shared" = "partition shared with the laptop's Windows install (Steam library and more)";
           "/mnt/Music" = "Polaris's music share over SMB";
         };

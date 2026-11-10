@@ -15,6 +15,11 @@ delib.module {
       (boolOption false)
       "Enable the Intel graphics driver instead of blacklisting i915";
 
+    cpuVendor =
+      description
+      (enumOption ["intel" "amd"] "intel")
+      "CPU vendor, for the matching KVM module and IOMMU kernel parameters";
+
     enableIommu =
       description
       (boolOption false)
@@ -28,6 +33,7 @@ delib.module {
 
   nixos.ifEnabled = {myconfig, ...}: let
     enableIntelGraphics = myconfig.system.boot.enableIntelGraphics;
+    isAmd = myconfig.system.boot.cpuVendor == "amd";
     enableIommu = myconfig.system.boot.enableIommu;
     disableFirmwareFramebuffer = myconfig.system.boot.disableFirmwareFramebuffer;
 
@@ -59,7 +65,13 @@ delib.module {
         lib.optionals myconfig.host.isDesktop ["nouveau"]
         ++ lib.optional (myconfig.host.isDesktop && !enableIntelGraphics) "i915";
 
-      kernelModules = lib.optionals myconfig.host.isDesktop ["kvm-intel"];
+      kernelModules = lib.optionals myconfig.host.isDesktop [
+        (
+          if isAmd
+          then "kvm-amd"
+          else "kvm-intel"
+        )
+      ];
 
       supportedFilesystems =
         ["ntfs"]
@@ -78,10 +90,11 @@ delib.module {
       );
 
       kernelParams =
-        lib.optionals (myconfig.host.isDesktop || enableIommu) [
-          "intel_iommu=on"
-          "iommu=pt"
-        ]
+        # The AMD IOMMU is on by default; Intel's needs intel_iommu=on.
+        lib.optionals (myconfig.host.isDesktop || enableIommu) (
+          lib.optional (!isAmd) "intel_iommu=on"
+          ++ ["iommu=pt"]
+        )
         ++ lib.optionals myconfig.host.isDesktop [
           "kvm.ignore_msrs=1"
           "modprobe.blacklist=nouveau${lib.optionalString (!enableIntelGraphics) ",i915"}"

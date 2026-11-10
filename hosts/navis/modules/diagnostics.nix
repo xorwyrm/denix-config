@@ -8,6 +8,9 @@ delib.module {
   name = "navis";
 
   nixos.ifEnabled = {
+    # The board's Nuvoton NCT6799D Super I/O: fan speeds and board temperatures.
+    boot.kernelModules = ["nct6775"];
+
     hardware.rasdaemon = {
       enable = true;
       record = true;
@@ -169,6 +172,27 @@ delib.module {
               printf '%s' "$values"
             }
 
+            # fan<N>:<rpm> for every fan header the named chip reports.
+            hwmon_fans() {
+              local wanted_name="$1"
+              local directory
+              local fan
+              local values=""
+
+              for directory in /sys/class/hwmon/hwmon*; do
+                if [[ -r "$directory/name" ]] \
+                  && [[ "$(read_path "$directory/name")" == "$wanted_name" ]]; then
+                  for fan in "$directory"/fan*_input; do
+                    if [[ -r "$fan" ]]; then
+                      values="''${values:+$values,}$(basename "$fan" _input):$(read_path "$fan")"
+                    fi
+                  done
+                fi
+              done
+
+              printf '%s' "$values"
+            }
+
             thermal_zone_values() {
               local zone
               local zone_type
@@ -202,18 +226,10 @@ delib.module {
                 --arg timestamp "$timestamp" \
                 --arg boot_id "$boot_id" \
                 --arg uptime_seconds "$(cut --delimiter=' ' --fields=1 /proc/uptime)" \
-                --arg ac_online "$(read_path /sys/class/power_supply/ACAD/online)" \
-                --arg battery_status "$(read_path /sys/class/power_supply/BAT1/status)" \
-                --arg battery_capacity_percent "$(read_path /sys/class/power_supply/BAT1/capacity)" \
-                --arg battery_voltage_uv "$(read_path /sys/class/power_supply/BAT1/voltage_now)" \
-                --arg battery_current_ua "$(read_path /sys/class/power_supply/BAT1/current_now)" \
-                --arg battery_power_uw "$(read_path /sys/class/power_supply/BAT1/power_now)" \
-                --arg platform_profile "$(read_path /sys/firmware/acpi/platform_profile)" \
-                --arg cpu_package_millicelsius "$(hwmon_value coretemp temp1_input)" \
-                --arg acpi_zone_millicelsius "$(hwmon_value acpitz temp1_input)" \
-                --arg wifi_millicelsius "$(hwmon_value iwlwifi_1 temp1_input)" \
-                --arg cpu_fan_rpm "$(hwmon_value asus fan1_input)" \
-                --arg gpu_fan_rpm "$(hwmon_value asus fan2_input)" \
+                --arg cpu_tctl_millicelsius "$(hwmon_value k10temp temp1_input)" \
+                --arg dimm_millicelsius "$(hwmon_values spd5118 temp1_input)" \
+                --arg board_systin_millicelsius "$(hwmon_value nct6799 temp1_input)" \
+                --arg board_fans_rpm "$(hwmon_fans nct6799)" \
                 --arg nvme_millicelsius "$(hwmon_values nvme temp1_input)" \
                 --arg thermal_zones_millicelsius "$(thermal_zone_values)" \
                 --arg nvidia_csv "$nvidia_csv" \
@@ -221,18 +237,10 @@ delib.module {
                   timestamp: $timestamp,
                   boot_id: $boot_id,
                   uptime_seconds: $uptime_seconds,
-                  ac_online: $ac_online,
-                  battery_status: $battery_status,
-                  battery_capacity_percent: $battery_capacity_percent,
-                  battery_voltage_uv: $battery_voltage_uv,
-                  battery_current_ua: $battery_current_ua,
-                  battery_power_uw: $battery_power_uw,
-                  platform_profile: $platform_profile,
-                  cpu_package_millicelsius: $cpu_package_millicelsius,
-                  acpi_zone_millicelsius: $acpi_zone_millicelsius,
-                  wifi_millicelsius: $wifi_millicelsius,
-                  cpu_fan_rpm: $cpu_fan_rpm,
-                  gpu_fan_rpm: $gpu_fan_rpm,
+                  cpu_tctl_millicelsius: $cpu_tctl_millicelsius,
+                  dimm_millicelsius: $dimm_millicelsius,
+                  board_systin_millicelsius: $board_systin_millicelsius,
+                  board_fans_rpm: $board_fans_rpm,
                   nvme_millicelsius: $nvme_millicelsius,
                   thermal_zones_millicelsius: $thermal_zones_millicelsius,
                   nvidia_csv: $nvidia_csv

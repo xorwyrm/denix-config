@@ -12,7 +12,7 @@ delib.host {
     system = {
       boot = {
         enable = true;
-        enableIntelGraphics = true;
+        cpuVendor = "amd";
       };
 
       environment.enable = true;
@@ -51,7 +51,7 @@ delib.host {
       helium.enable = true;
       mpv = {
         enable = true;
-        hardwareDecodeDevice = "/dev/dri/by-path/pci-0000:00:02.0-render";
+        nvdec = true;
       };
       mpd.enable = true;
       rmpc.enable = true;

@@ -12,7 +12,8 @@ delib.module {
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBsHqYKt58eFcZo7UdPX45CaEhLeGge+cE1Gdt74IHSv MacBook"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL2vmQG3o3yMTXUbHYM7evCpUo/V+gK8Lofajt/hEjrB navis"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIARRfEXoLrza1riqJJb0qFVYqOhNpXJEP9VI11K2RPJH marshall@navis"
-      "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLNLzoJDzuVhWZXuUO70Yj6bWg6t8kBFH0fWZIIwTC1w9w7Uv0ERuSBcp752fOpkm7fY5c2lyt12/ymEOParbhk= navis-tpm-polaris"
+      # Sealed to navis's TPM (re-created 2026-11-09 after the move to the desktop).
+      "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKRBwdnopyERxlOH650eeDYbuH2Kp8vxHgaCMzYNEchpnGHDdEXFCJUNuYqznh9PbBsDEk7jc9ppJb/fd41vWSA= navis-tpm-polaris"
     ]);
 
     # Each host's agent key (~/.ssh/id_ed25519_fleet). On hosts with fleet's

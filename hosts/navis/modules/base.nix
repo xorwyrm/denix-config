@@ -24,8 +24,8 @@ delib.module {
       hosts."37.27.111.236" = ["builder"];
 
       interfaces = {
-        enp5s0.useDHCP = lib.mkDefault true;
-        wlp4s0.useDHCP = lib.mkDefault true;
+        eno1.useDHCP = lib.mkDefault true;
+        wlp6s0.useDHCP = lib.mkDefault true;
       };
 
       networkmanager.wifi.powersave = false;
