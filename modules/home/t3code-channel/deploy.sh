@@ -158,6 +158,14 @@ deploy_canis() {
 
   ssh "${ssh_options[@]}" "$canis_host" "mkdir -p '$canis_cache' && chmod -R u+w '$canis_cache'" || return $?
   scp "${ssh_options[@]}" "$canis_package" "$script_dir/active-database.mjs" "$canis_host:$canis_cache/" || return $?
+  # canis is not Nix-managed, so it gets the T3 Connect fleet key from Builder's copy
+  # (system.t3ConnectFleetKey installs it there).
+  local fleet_key="$HOME/.t3/userdata/secrets/connect-fleet-key.bin"
+  if [[ -f "$fleet_key" ]]; then
+    ssh "${ssh_options[@]}" "$canis_host" \
+      "umask 077 && mkdir -p ~/.t3/userdata/secrets && cat > ~/.t3/userdata/secrets/connect-fleet-key.bin" \
+      < "$fleet_key" || return $?
+  fi
   ssh "${ssh_options[@]}" "$canis_host" bash -s -- \
     "$version" "$canis_cache/$(basename "$canis_package")" "$canis_cache/active-database.mjs" "$canis_mode" <<'CANIS'
 set -euo pipefail

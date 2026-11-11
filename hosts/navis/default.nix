@@ -19,6 +19,7 @@ delib.host {
       fleetApprovals.enable = true;
       fleetSsh.enable = true;
       fonts.enable = true;
+      t3ConnectFleetKey.enable = true;
       hardware.enable = true;
       i18n.enable = true;
       networking.enable = true;
