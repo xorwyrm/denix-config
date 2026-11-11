@@ -220,6 +220,20 @@ fi
 database="$(node "$active_database_script" "$database")"
 cp "$plist" "$backup"
 /usr/libexec/PlistBuddy -c "Set :ProgramArguments:$entry_index $entry" "$plist"
+# Serve the tailnet too (not only loopback), so the other machines reach this one directly.
+if ! args="$(plutil -extract ProgramArguments json -o - "$plist")" ||
+  ! args="$("$node_bin" -e '
+const args = JSON.parse(process.argv[1]);
+const host = args.indexOf("--host");
+if (host !== -1) args.splice(host, 2);
+if (!args.includes("--lan")) args.push("--lan");
+console.log(JSON.stringify(args));
+' "$args")" ||
+  ! plutil -replace ProgramArguments -json "$args" "$plist"; then
+  cp "$backup" "$plist"
+  echo "Could not update the server arguments; leaving the running server alone." >&2
+  exit 1
+fi
 if ! launchctl bootout "gui/$(id -u)/codes.t3.server"; then
   cp "$backup" "$plist"
   echo "Could not stop the existing server; leaving its database untouched." >&2
@@ -273,6 +287,10 @@ prune() {
   fi
   for copy in "$plist".before-*.database.*; do
     [[ "$copy" == "$database_backup" ]] || rm -rf "$copy" || echo "Could not remove $copy" >&2
+  done
+  for copy in "$plist".before-*; do
+    [[ -f "$copy" && "$copy" != "$backup" ]] || continue
+    rm -f "$copy" || echo "Could not remove $copy" >&2
   done
   rm -rf "$HOME/.cache/t3code-channel" || echo "Could not remove the cached release" >&2
 }
