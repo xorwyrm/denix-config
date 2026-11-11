@@ -88,17 +88,32 @@ const httpReady = () =>
   });
 
 const current = JSON.parse(await readFile(statePath, "utf8"));
-if (![2, 3].includes(current.protocol) || current.activeVersion !== expectedVersion) {
+if (![2, 3, 4].includes(current.protocol) || current.activeVersion !== expectedVersion) {
   throw new Error(`Unexpected active service state: ${JSON.stringify(current)}`);
 }
 if ((await readFile(sentinelPath, "utf8")).trim() !== targetVersion) {
   throw new Error(`Candidate sentinel does not match ${targetVersion}`);
 }
 
+const executable = path.join(baseDir, "runtime/versions", targetVersion, "t3");
+const launcherProtocolOf = async (file) => {
+  const bytes = await readFile(file);
+  const marker = Buffer.from("SERVICE_LAUNCHER_PROTOCOL = ");
+  const at = bytes.indexOf(marker);
+  const digits = at === -1 ? null : /^\d+/.exec(bytes.subarray(at + marker.length, at + marker.length + 4).toString("latin1"));
+  if (digits === null) throw new Error(`Could not read the launcher protocol of ${file}`);
+  return Number(digits[0]);
+};
+const targetProtocol = await launcherProtocolOf(executable);
+
 const backupPath = `${statePath}.before-${targetVersion}.json`;
 await copyFile(statePath, backupPath);
-if (current.protocol === 2) {
-  const executable = path.join(baseDir, "runtime/versions", targetVersion, "t3");
+if (targetProtocol > current.protocol) {
+  // The launcher survives self-updates, and a child built for a newer launcher
+  // protocol rejects the old launcher's startup context. Point the unit at the
+  // candidate's own launcher instead of running a trial. The channel drop-in
+  // from the protocol-2 upgrade goes too: newer launchers repoint the unit
+  // itself after each update, and the drop-in would override that.
   const version = spawnSync(executable, ["--version"], { encoding: "utf8" });
   if (version.status !== 0 || version.stdout.trim() !== `t3 v${targetVersion}`) {
     throw new Error("Native candidate version verification failed");
@@ -107,10 +122,17 @@ if (current.protocol === 2) {
     const result = spawnSync("systemctl", ["--user", action, ...(action === "daemon-reload" ? [] : [unit])], { encoding: "utf8" });
     if (result.status !== 0) throw new Error(`${action} failed: ${result.stderr || result.stdout}`);
   };
+  const unitPath = path.join(process.env.HOME, ".config/systemd/user", unit);
   const dropIn = path.join(process.env.HOME, ".config/systemd/user", `${unit}.d`, "channel-runtime.conf");
+  const previousUnit = await readFile(unitPath, "utf8");
   let previousDropIn;
   try { previousDropIn = await readFile(dropIn); }
   catch (error) { if (error.code !== "ENOENT") throw error; }
+  const execStart = /^ExecStart=.*$/m;
+  if (!execStart.test(previousUnit)) throw new Error(`${unitPath} has no ExecStart line`);
+  const quoted = '"' + executable.replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll('%', '%%') + '"';
+  const nextUnit = previousUnit.replace(execStart, () => `ExecStart=${quoted} __service-launcher`);
+  // Held only until the new launcher serves, so a failed start can roll back.
   const databaseBackup = `${backupPath}.database-${randomUUID()}`;
   await mkdir(databaseBackup, { mode: 0o700 });
   const files = ["state.sqlite", "state.sqlite-wal", "state.sqlite-shm", "statev2.sqlite", "statev2.sqlite-wal", "statev2.sqlite-shm"];
@@ -121,17 +143,21 @@ if (current.protocol === 2) {
       try { await copyFile(path.join(baseDir, "userdata", file), path.join(databaseBackup, file)); saved.add(file); }
       catch (error) { if (error.code !== "ENOENT" || file === path.basename(dbPath)) throw error; }
     }
-  } catch (error) { control("start"); throw error; }
+  } catch (error) {
+    control("start");
+    await rm(databaseBackup, { recursive: true, force: true });
+    throw error;
+  }
   try {
-    await mkdir(path.dirname(dropIn), { recursive: true });
-    const quoted = '"' + executable.replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll('%', '%%') + '"';
-    await writeFile(dropIn, `[Service]\nExecStart=\nExecStart=${quoted} __service-launcher\n`, { mode: 0o600 });
-    await writeState({ protocol: 3, activeVersion: targetVersion });
+    await writeFile(unitPath, nextUnit);
+    await rm(dropIn, { force: true });
+    await writeState({ protocol: targetProtocol, activeVersion: targetVersion });
     control("daemon-reload");
     control("start");
     for (let attempt = 0; attempt < 90; attempt += 1) {
       if (await httpReady()) {
-        log(`SUCCESS: upgraded launcher to protocol 3 and ${targetVersion}; backup ${databaseBackup}`);
+        await rm(databaseBackup, { recursive: true, force: true });
+        log(`SUCCESS: moved the launcher to protocol ${targetProtocol} and ${targetVersion}.`);
         process.exit(0);
       }
       await sleep(2_000);
@@ -144,11 +170,15 @@ if (current.protocol === 2) {
       if (saved.has(file)) await copyFile(path.join(databaseBackup, file), destination);
       else await rm(destination, { force: true });
     }
-    if (previousDropIn === undefined) await rm(dropIn, { force: true });
-    else await writeFile(dropIn, previousDropIn);
+    await writeFile(unitPath, previousUnit);
+    if (previousDropIn !== undefined) {
+      await mkdir(path.dirname(dropIn), { recursive: true });
+      await writeFile(dropIn, previousDropIn, { mode: 0o600 });
+    }
     await writeState(current);
     control("daemon-reload");
     control("start");
+    await rm(databaseBackup, { recursive: true, force: true });
     throw error;
   }
 }
