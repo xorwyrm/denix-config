@@ -371,6 +371,12 @@ fi
 current_stage="publishing integration branch"
 git -C "$source_repo" push origin main
 integration_active=0
+# GitHub resolves --ref main when the dispatch arrives, and right after a push it
+# can still answer with the previous commit, which the workflow then refuses.
+for attempt in $(seq 1 24); do
+  [[ "$(gh api "repos/${fork_repo}/git/ref/heads/main" --jq .object.sha 2>/dev/null || true)" == "$integration_sha" ]] && break
+  sleep 5
+done
 dispatch_output="$(gh workflow run "personal-release.yml" --repo "$fork_repo" --ref main --json < "$workflow_inputs_file")"
 printf '%s\n' "$dispatch_output"
 # A retry of an unchanged integration shares its commit with the earlier failed
