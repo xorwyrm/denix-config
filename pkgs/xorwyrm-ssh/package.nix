@@ -13,14 +13,14 @@ rustPlatform.buildRustPackage {
   src = fetchFromGitHub {
     owner = "xorwyrm";
     repo = "xorwyrm.sh";
-    rev = "a9b7d7bd204492b250f0048924fa6a6e3658c48c";
-    hash = "sha256-hpv53aiNB79HU0muZtPpbk8AIiC2E99W0+tvsx+w4bY=";
+    rev = "d8d183281f5cb7704973c27a98646b65326e89ce";
+    hash = "sha256-UrlMsjyVY7k6FIo2x9uxWdsicPwUVHT1Rhl9xKYeTkM=";
   };
 
   # The crate is in ssh/; it builds in the site's text from src/data/site.json.
   cargoRoot = "ssh";
   buildAndTestSubdir = "ssh";
-  cargoHash = "sha256-rZ1vSv7r0gWTHpmjvDB7ui/3AEQ5+WsUo7n2On98ioE=";
+  cargoHash = "sha256-nDB0nc4Aoo8WeWt0hAeyvnRSPVk1fucE+XKtRaamMo0=";
 
   meta = {
     description = "xorwyrm.sh in a terminal, over ssh";

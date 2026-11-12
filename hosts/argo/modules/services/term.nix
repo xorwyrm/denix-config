@@ -53,11 +53,20 @@ in
         '';
       };
 
+      # It's on the open internet and lets everyone in, so it's boxed in as if
+      # it were already broken into. Its own limits (pkgs/xorwyrm-ssh, main.rs)
+      # come first; these hold whatever happens inside it.
       systemd.services.xorwyrm-term = {
         description = "xorwyrm.sh over ssh (term.xorwyrm.sh)";
         wantedBy = ["multi-user.target"];
         after = ["network-online.target"];
         wants = ["network-online.target"];
+        # Its whole filesystem is its own binary and the C library: no shell,
+        # no /etc, no /home, no /run, nothing of argo's to read or run.
+        confinement = {
+          enable = true;
+          binSh = null;
+        };
         environment = {
           # both IPv4 and IPv6
           XORWYRM_LISTEN = "[::]:${toString port}";
@@ -94,13 +103,55 @@ in
           RestrictSUIDSGID = true;
           LockPersonality = true;
           MemoryDenyWriteExecute = true;
+          PrivateUsers = true;
+          PrivateIPC = true;
+          KeyringMode = "private";
           SystemCallArchitectures = "native";
-          SystemCallFilter = ["@system-service" "~@privileged" "~@resources"];
+          # It answers connections and never makes one: without connect (or
+          # io_uring, which could do the same) it can't open a connection to
+          # anything, on argo or off it.
+          SystemCallFilter = [
+            "@system-service"
+            "~@privileged"
+            "~@resources"
+            "~connect"
+            "~io_uring_setup"
+            "~io_uring_enter"
+            "~io_uring_register"
+          ];
+          SystemCallErrorNumber = "EPERM";
+          # It may listen on its one port and no other.
+          SocketBindAllow = "tcp:${toString port}";
+          SocketBindDeny = "any";
+          # No packets to or from argo's own addresses, Tailscale, or private
+          # ranges: visitors come from the public internet, and nothing local
+          # (postgres, the things on localhost) is any of its business.
+          IPAddressDeny = [
+            "localhost"
+            "link-local"
+            "multicast"
+            "10.0.0.0/8"
+            "172.16.0.0/12"
+            "192.168.0.0/16"
+            "100.64.0.0/10"
+            "fc00::/7"
+            "${ipv4}/32"
+            "2a01:4f9:3070:2256::/64"
+          ];
           UMask = "0077";
-          # 200 visitors at most (its own limit) fit well inside these.
+
+          # The most it can take from argo. It caps itself well below these
+          # (320 connections, 200 sessions, about 190 Mbit/s out).
           MemoryMax = "1G";
+          MemorySwapMax = 0;
           CPUQuota = "200%";
+          # and when argo is busy, everything else goes first
+          CPUWeight = 20;
+          IOWeight = 20;
+          Nice = 5;
+          OOMScoreAdjust = 500;
           TasksMax = 64;
+          LimitNOFILE = 1024;
         };
       };
     };
