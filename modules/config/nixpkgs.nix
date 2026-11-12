@@ -36,6 +36,7 @@
       stalwart = prev.callPackage ../../pkgs/stalwart/package.nix {};
       stalwart-cli = prev.callPackage ../../pkgs/stalwart-cli/package.nix {};
       tailrpproxy = prev.callPackage ../../pkgs/tailrpproxy/package.nix {};
+      xorwyrm-ssh = prev.callPackage ../../pkgs/xorwyrm-ssh/package.nix {};
       trmnl-panels = prev.callPackage ../../pkgs/trmnl-panels/package.nix {};
       visor-bootmanager = prev.callPackage ../../pkgs/visor-bootmanager/package.nix {};
       # The zen kernel has no legacy iptables backend; Waydroid's network
