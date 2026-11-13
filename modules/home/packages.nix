@@ -19,7 +19,7 @@ delib.module {
       release = builtins.fromJSON (builtins.readFile ./t3code-release.json);
       inherit (release) version;
       appImage = pkgs.fetchurl {
-        url = "https://github.com/${release.repository}/releases/download/${release.tagPrefix}${version}/T3-Code-${version}-x86_64.AppImage";
+        url = "https://github.com/${release.repository}/releases/download/${release.tagPrefix}${version}/${release.appImageName or "T3-Code-${version}-x86_64.AppImage"}";
         hash = release.appImageHash;
       };
       package = inputs.t3code-flake.packages.${system}.t3-code-nightly.overrideAttrs {

@@ -61,7 +61,8 @@ server_tgz="$release_dir/t3-${version}.tgz"
 linux_archive="$release_dir/t3-${version}-linux-x64.tar.gz"
 [[ -f "$linux_archive" ]] || { log "Missing Linux runtime archive"; exit 1; }
 shopt -s nullglob
-app_images=("$release_dir"/T3-Code-*-x86_64.AppImage)
+# Releases name the AppImage T3-Code-x86_64.AppImage; older ones put the version in the name.
+app_images=("$release_dir"/T3-Code-x86_64.AppImage "$release_dir"/T3-Code-*-x86_64.AppImage)
 shopt -u nullglob
 if [[ ${#app_images[@]} -ne 1 ]]; then
   log "Expected exactly one AppImage in the release; found ${#app_images[@]}."
@@ -358,14 +359,15 @@ app_image_hash="$(nix hash file --type sha256 --sri "$app_image")"
 release_json="$denix_repo/modules/home/t3code-release.json"
 node -e '
   const fs = require("node:fs");
-  const [file, version, appImageHash, repository] = process.argv.slice(1);
+  const [file, version, appImageHash, appImageName, repository] = process.argv.slice(1);
   fs.writeFileSync(file, `${JSON.stringify({
     version,
     appImageHash,
+    appImageName,
     repository,
     tagPrefix: "personal-v",
   }, null, 2)}\n`);
-' "$release_json" "$version" "$app_image_hash" "$fork_repo"
+' "$release_json" "$version" "$app_image_hash" "$(basename "$app_image")" "$fork_repo"
 git -C "$denix_repo" add modules/home/t3code-release.json
 if ! git -C "$denix_repo" diff --cached --quiet; then
   git -C "$denix_repo" commit -m "update T3 Code personal channel to ${version}"
