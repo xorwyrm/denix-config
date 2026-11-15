@@ -75,6 +75,9 @@ in
       enable = boolOption false;
       credentialHelper = allowNull (strOption null);
       signingKey = allowNull (strOption null);
+      # "ssh" signs with the SSH key file in signingKey: agents can use it
+      # without a pinentry, unlike a GPG key.
+      signingFormat = enumOption ["openpgp" "ssh"] "openpgp";
     };
 
     home.ifEnabled = {myconfig, ...}:
@@ -93,6 +96,7 @@ in
 
               signing = {
                 signByDefault = true;
+                format = myconfig.programs.git.signingFormat;
                 key = myconfig.programs.git.signingKey;
               };
 

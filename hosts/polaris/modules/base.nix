@@ -136,8 +136,6 @@ delib.module {
         };
       };
 
-      sudo-rs.wheelNeedsPassword = lib.mkForce true;
-
       sudo.extraRules = [
         {
           users = [config.myconfig.constants.username];

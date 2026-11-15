@@ -10,7 +10,6 @@ delib.host {
 
     system = {
       environment.enable = true;
-      fleetApprovals.enable = true;
       fleetSsh.enable = true;
       nix.enable = true;
       t3ConnectFleetKey.enable = true;

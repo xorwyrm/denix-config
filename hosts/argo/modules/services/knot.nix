@@ -48,7 +48,7 @@ in
           lfs = {
             store_path = "${stateDir}/lfs";
             # The subvolume shares its filesystem with home and /scratch; keep
-            # the headroom fleet jobs need there.
+            # headroom there for builds.
             free_space_floor_bytes = 100 * 1024 * 1024 * 1024;
           };
 

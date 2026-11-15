@@ -16,8 +16,8 @@ delib.module {
       "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKRBwdnopyERxlOH650eeDYbuH2Kp8vxHgaCMzYNEchpnGHDdEXFCJUNuYqznh9PbBsDEk7jc9ppJb/fd41vWSA= navis-tpm-polaris"
     ]);
 
-    # Each host's agent key (~/.ssh/id_ed25519_fleet). On hosts with fleet's
-    # sandbox, sessions with these run in it.
+    # Each host's own key (~/.ssh/id_ed25519_fleet), which its agents and
+    # services use to reach the other hosts (system.fleetSsh).
     agents = readOnly (attrsOfOption str {
       argo = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINmHB1IqZ2XbtRnxyXL7uAnuFB1e8dhGhBlHTTFL0IKU fleet-builder";
       polaris = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGEtGBP9oDI1KcX1ZPh/QL/7TJzykmRN4zB3KljtG8BP fleet-polaris";

@@ -45,7 +45,6 @@ delib.host {
 
     system = {
       environment.enable = true;
-      fleetApprovals.enable = true;
       fleetSsh.enable = true;
       hardware.enable = true;
       t3ConnectFleetKey.enable = true;
@@ -92,7 +91,9 @@ delib.host {
       git = {
         enable = true;
         credentialHelper = "libsecret";
-        signingKey = "6FB1AE28C81E4359";
+        # Registered on GitHub as the signing key "Polaris agents".
+        signingFormat = "ssh";
+        signingKey = "~/.ssh/id_ed25519_agent_signing.pub";
       };
     };
   };

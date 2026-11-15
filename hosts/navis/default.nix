@@ -16,7 +16,6 @@ delib.host {
       };
 
       environment.enable = true;
-      fleetApprovals.enable = true;
       fleetSsh.enable = true;
       fonts.enable = true;
       t3ConnectFleetKey.enable = true;

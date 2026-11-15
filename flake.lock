@@ -588,26 +588,6 @@
         "type": "github"
       }
     },
-    "fleetd": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1793551039,
-        "narHash": "sha256-kFalHka0JYwEXPjPr0/apr7RekkdaRod/UhSktJpFVM=",
-        "ref": "refs/heads/main",
-        "rev": "21386b3d99bdaad51eed146473a5b1aed95c0f8d",
-        "revCount": 79,
-        "type": "git",
-        "url": "https://github.com/xorwyrm/fleetd"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://github.com/xorwyrm/fleetd"
-      }
-    },
     "gitignore": {
       "inputs": {
         "nixpkgs": [
@@ -1612,7 +1592,6 @@
         "draconisplusplus-plugin-lab": "draconisplusplus-plugin-lab",
         "draconisplusplus-plugins": "draconisplusplus-plugins",
         "fish-git-abbr": "fish-git-abbr",
-        "fleetd": "fleetd",
         "home-manager": "home-manager",
         "hyprglass": "hyprglass",
         "hyprland": "hyprland",

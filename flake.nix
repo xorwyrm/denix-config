@@ -65,11 +65,6 @@
       };
     };
 
-    fleetd = {
-      url = "git+https://github.com/xorwyrm/fleetd";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     fish-git-abbr = {
       url = "github:xorwyrm/fish-git-abbr/patch-1";
       flake = false;

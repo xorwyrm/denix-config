@@ -8,7 +8,7 @@
   # password) and tunnel-token (the Cloudflare Tunnel that publishes Postgres
   # to the relay's Hyperdrive, behind a Cloudflare Access service token).
   stateDir = "/var/lib/t3-relay";
-  # 5432 is taken by a project database run from a fleet job.
+  # 5432 is taken by a project database run from a background job.
   port = 5433;
   tlsDir = "/var/lib/t3-relay-db-tls";
   postgres = config.services.postgresql.package;
