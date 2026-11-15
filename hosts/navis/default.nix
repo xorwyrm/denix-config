@@ -43,6 +43,7 @@ delib.host {
     };
 
     programs = {
+      agent-github.enable = true;
       bun.enable = true;
       cava.enable = true;
       codex-desktop.enable = true;
