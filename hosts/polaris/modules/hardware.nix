@@ -11,7 +11,12 @@ delib.module {
   nixos.ifEnabled = {
     boot = {
       binfmt.emulatedSystems = ["aarch64-linux"];
-      kernelPackages = pkgs.linuxPackages_xanmod_latest;
+      # Our nixpkgs (2026-11-07) also applies tools_128bit_types, which xanmod
+      # 7.3 already includes, so the build fails; nixpkgs dropped it on
+      # 2026-11-11. Go back to linuxPackages_xanmod_latest after the next update.
+      kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_xanmod_latest.override {
+        kernelPatches = with pkgs.kernelPatches; [bridge_stp_helper request_key_helper];
+      });
       loader.systemd-boot.enable = true;
 
       initrd.availableKernelModules = [

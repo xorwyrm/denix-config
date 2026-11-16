@@ -60,6 +60,11 @@ in
         cd node_modules/.pnpm/isolated-vm@6.0.2/node_modules/isolated-vm
         # GCC 16 no longer provides uint32_t to timer.h transitively.
         sed -i '1i #include <cstdint>' src/lib/timer.h
+        # binding.gyp links every library in Node's process.config, which for
+        # nixpkgs' Node is all of its shared libraries (-luv, -lsqlite3, ...),
+        # not on the linker path here. The node process loading the addon
+        # already provides them.
+        sed -i '/process.config.target_defaults.libraries/d' binding.gyp
         node-gyp rebuild --release -j "$NIX_BUILD_CORES"
       )
       (
