@@ -18,7 +18,7 @@
       exec ${lib.getExe uv} run \
         --no-project \
         --python ${lib.getExe python313} \
-        --with gamdl==3.8.5 \
+        --with gamdl==4.1.1 \
         python ${./bridge.py} "$@"
     '';
   };

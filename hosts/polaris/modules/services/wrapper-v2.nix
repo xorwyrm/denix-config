@@ -80,9 +80,13 @@ delib.module {
       environment = {
         WRAPPER_HOST = "127.0.0.1";
         WRAPPER_PORT = "8080";
-        WRAPPER_DECRYPT_HOST = "127.0.0.1";
-        WRAPPER_DECRYPT_PORT = "10020";
-        WRAPPER_BASE_DIR = "/data/data/com.apple.android.music/files";
+        WRAPPER_LAUNCHER = "${pkgs.local.wrapper-v2}/libexec/worker-launch";
+        WRAPPER_ROOTFS = "/var/lib/wrapper-v2/rootfs";
+        WRAPPER_SESSION_DIR = "/data/data/com.apple.android.music/files";
+        # The saved login belongs to the identity the pre-1.0 wrapper used by
+        # default. 1.0.0 would otherwise generate a new one for this session.
+        WRAPPER_DEVICE_INFO = "Music/4.9/Android/10/Samsung S9/7663313/en-US/en-US/dc28071e981c439e";
+        RUST_LOG = "info";
       };
       serviceConfig = {
         User = "wrapper-v2";
@@ -110,12 +114,17 @@ delib.module {
         LockPersonality = true;
         RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6"];
         UMask = "0077";
+        # The Android and Apple libraries in runtime/ match the 1.0.0 build
+        # 1109 x86_64 profile; the worker and its metadata come from the store.
         BindReadOnlyPaths = [
           "/var/lib/wrapper-v2/runtime/system/lib64:/var/lib/wrapper-v2/rootfs/system/lib64"
           "/var/lib/wrapper-v2/runtime/system/bin/linker64:/var/lib/wrapper-v2/rootfs/system/bin/linker64"
-          "${pkgs.local.wrapper-v2}/system/bin/main:/var/lib/wrapper-v2/rootfs/system/bin/main"
+          "${pkgs.local.wrapper-v2}/system/bin/apple-music-worker:/var/lib/wrapper-v2/rootfs/system/bin/apple-music-worker"
+          "${pkgs.local.wrapper-v2}/system/usr/share/zoneinfo/tzdata:/var/lib/wrapper-v2/rootfs/system/usr/share/zoneinfo/tzdata"
+          "${pkgs.local.wrapper-v2}/worker-profile.json:/var/lib/wrapper-v2/rootfs/worker-profile.json"
           "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt:/var/lib/wrapper-v2/rootfs/etc/ssl/certs/ca-certificates.crt"
         ];
+        TemporaryFileSystem = ["/var/lib/wrapper-v2/rootfs/tmp:mode=1777,nosuid,nodev"];
       };
     };
   };

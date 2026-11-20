@@ -3,8 +3,8 @@
 Lidarr already knows how to search a Newznab indexer and how to supervise a
 SABnzbd download client.  This process implements only those two narrow
 protocol surfaces.  Catalog searches use gamdl's authenticated Apple Music
-API, while a configurable pool of background workers invokes ``python -m
-gamdl`` for grabs.
+API, while a configurable pool of background workers invokes ``gamdl rip``
+for grabs.
 
 The module deliberately has no import-time dependency on gamdl.  That keeps
 the protocol and persistence code independently testable and, more
@@ -329,22 +329,16 @@ def parse_multipart_nzb(content_type: str, content: bytes) -> bytes:
 class GamdlCatalog:
     """Authenticated Apple Music catalog search using gamdl's wrapper API."""
 
-    def __init__(
-        self,
-        wrapper_url: str,
-        decrypt_host: str,
-        decrypt_port: int,
-    ) -> None:
+    def __init__(self, wrapper_url: str) -> None:
         self.wrapper_url = wrapper_url
-        self.decrypt_host = decrypt_host
-        self.decrypt_port = decrypt_port
         self._lock = threading.Lock()
 
     @staticmethod
     def _configure_quiet_structlog() -> None:
-        # WrapperApi.get_me logs the complete response at DEBUG, including auth
-        # material.  Configure the filtering wrapper before importing/creating
-        # either gamdl API and discard third-party structured events entirely.
+        # The wrapper exports Apple Music tokens to gamdl.  Configure the
+        # filtering wrapper before importing/creating either gamdl API and
+        # discard third-party structured events entirely, so nothing
+        # auth-bearing can reach the service log.
         import structlog
 
         structlog.configure(
@@ -364,12 +358,10 @@ class GamdlCatalog:
         wrapper_api = None
         apple_api = None
         try:
-            wrapper_api = await WrapperApi.create(
-                base_url=self.wrapper_url,
-                decrypt_host=self.decrypt_host,
-                decrypt_port=self.decrypt_port,
-            )
-            apple_api = await AppleMusicApi.create_from_wrapper(wrapper_api=wrapper_api)
+            # Without a credentials prompt this only restores the wrapper's
+            # saved session; it never starts an interactive login.
+            wrapper_api = await WrapperApi.create(base_url=self.wrapper_url)
+            apple_api = await AppleMusicApi.from_wrapper(wrapper_api)
             result = await apple_api.get_search_results(
                 term=term,
                 types="albums",
@@ -415,15 +407,12 @@ class GamdlCatalog:
                 )
             return albums
         finally:
-            clients = []
-            if apple_api is not None:
-                clients.append(getattr(apple_api, "client", None))
-            if wrapper_api is not None:
-                clients.append(getattr(wrapper_api, "client", None))
-            for client in clients:
-                if client is not None:
+            # Closing these releases their HTTP clients; the wrapper's own
+            # session stays logged in.
+            for api in (apple_api, wrapper_api):
+                if api is not None:
                     try:
-                        await client.aclose()
+                        await api.aclose()
                     except Exception:  # noqa: BLE001,S110 - never log auth-bearing clients
                         pass
 
@@ -438,17 +427,11 @@ class GamdlRunner:
     def __init__(
         self,
         wrapper_url: str,
-        decrypt_host: str,
-        decrypt_port: int,
-        ffmpeg_path: str,
         *,
         popen_factory: Callable[..., subprocess.Popen[Any]] = subprocess.Popen,
         poll_interval: float = 0.25,
     ) -> None:
         self.wrapper_url = wrapper_url
-        self.decrypt_host = decrypt_host
-        self.decrypt_port = decrypt_port
-        self.ffmpeg_path = ffmpeg_path
         self.popen_factory = popen_factory
         self.poll_interval = poll_interval
 
@@ -458,28 +441,27 @@ class GamdlRunner:
         # ALAC and AAC are intentionally separate grabs.  In particular, an
         # ALAC result must never silently fall back to AAC after Lidarr accepted
         # it as a lossless release.
+        # gamdl's "alac" picks the best ALAC tier the release offers.  Its
+        # media database stays off: the bridge tracks jobs itself, and a
+        # remembered track would be skipped instead of staged for Lidarr.
         return [
             sys.executable,
-            "-m",
-            "gamdl",
-            "--no-config-file",
-            "--no-exceptions",
-            "--log-level",
-            "INFO",
+            "-c",
+            "from gamdl.cli.main import main; main(prog_name='gamdl')",
+            "--no-config",
+            "rip",
+            "--auth-mode",
+            "wrapper",
             "--wrapper-url",
             self.wrapper_url,
-            "--wrapper-decrypt-host",
-            self.decrypt_host,
-            "--wrapper-decrypt-port",
-            str(self.decrypt_port),
-            "--ffmpeg-path",
-            self.ffmpeg_path,
-            "--use-wrapper",
             "--song-codec-priority",
             str(job["codec"]),
-            "--synced-lyrics-format",
+            "--lyrics-file-format",
             "lrc",
-            "--output-path",
+            "--no-database",
+            "--no-progress",
+            "--no-tracebacks",
+            "--output-dir",
             str(output_dir),
             "--temp-path",
             str(temp_dir),
@@ -1579,21 +1561,6 @@ def build_parser() -> argparse.ArgumentParser:
         default=os.environ.get("LIDARR_GAMDL_WRAPPER_URL", "http://127.0.0.1:8080"),
     )
     parser.add_argument(
-        "--decrypt-host",
-        default=os.environ.get("LIDARR_GAMDL_DECRYPT_HOST", "127.0.0.1"),
-    )
-    parser.add_argument(
-        "--decrypt-port",
-        type=int,
-        default=int(os.environ.get("LIDARR_GAMDL_DECRYPT_PORT", "10020")),
-    )
-    parser.add_argument(
-        "--ffmpeg-path",
-        default=os.environ.get(
-            "LIDARR_GAMDL_FFMPEG_PATH", shutil.which("ffmpeg") or "ffmpeg"
-        ),
-    )
-    parser.add_argument(
         "--ffprobe-path",
         default=os.environ.get(
             "LIDARR_GAMDL_FFPROBE_PATH", shutil.which("ffprobe") or "ffprobe"
@@ -1629,8 +1596,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error(
             "--api-key, --api-key-file, or the corresponding environment variable is required"
         )
-    if not 1 <= args.port <= 65535 or not 1 <= args.decrypt_port <= 65535:
-        parser.error("ports must be between 1 and 65535")
+    if not 1 <= args.port <= 65535:
+        parser.error("the port must be between 1 and 65535")
     if not 1 <= args.workers <= 16:
         parser.error("workers must be between 1 and 16")
 
@@ -1646,12 +1613,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     download_dir = args.download_dir.resolve(strict=False)
     state_dir.mkdir(parents=True, exist_ok=True)
     download_dir.mkdir(parents=True, exist_ok=True)
-    runner = GamdlRunner(
-        args.wrapper_url,
-        args.decrypt_host,
-        args.decrypt_port,
-        args.ffmpeg_path,
-    )
+    runner = GamdlRunner(args.wrapper_url)
     probe = FfprobeAudioProbe(args.ffprobe_path)
     jobs = JobManager(
         state_dir / "jobs.sqlite3",
@@ -1661,7 +1623,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         probe,
         worker_count=args.workers,
     )
-    catalog = GamdlCatalog(args.wrapper_url, args.decrypt_host, args.decrypt_port)
+    catalog = GamdlCatalog(args.wrapper_url)
     app = BridgeApp(
         api_key,
         catalog,

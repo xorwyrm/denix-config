@@ -1163,10 +1163,6 @@ in
                 gamdlDownloadDir
                 "--wrapper-url"
                 "http://127.0.0.1:8080"
-                "--decrypt-host"
-                "127.0.0.1"
-                "--decrypt-port"
-                "10020"
                 "--workers"
                 "3"
               ];
