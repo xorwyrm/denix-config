@@ -164,6 +164,34 @@ def directory_size(root: Path) -> int:
     return total
 
 
+def process_umask() -> int:
+    # os.umask() can only be read by setting it, which races other threads.
+    try:
+        with open("/proc/self/status", encoding="ascii") as status:
+            for line in status:
+                if line.startswith("Umask:"):
+                    return int(line.split()[1], 8)
+    except (OSError, ValueError, IndexError):
+        pass
+    return 0o022
+
+
+def restore_default_file_modes(root: Path) -> None:
+    """Give gamdl's output the mode an ordinary create would have.
+
+    gamdl 4 stages every file with NamedTemporaryFile, which always creates
+    it 0600, and renames it into place unchanged, so Lidarr's group could
+    not read it.
+    """
+    mode = 0o666 & ~process_umask()
+    for path in root.rglob("*"):
+        try:
+            if path.is_file() and not path.is_symlink():
+                path.chmod(mode)
+        except OSError:
+            continue
+
+
 def _scoped_path(path: Path, root: Path) -> Path:
     resolved_root = root.resolve(strict=False)
     resolved_path = path.resolve(strict=False)
@@ -502,6 +530,7 @@ class GamdlRunner:
         while True:
             returncode = process.poll()
             if returncode is not None:
+                restore_default_file_modes(output_dir)
                 return ProcessResult(returncode=returncode)
             if cancel_event.wait(self.poll_interval):
                 self._terminate_process_group(process)
