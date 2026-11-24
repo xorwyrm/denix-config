@@ -1,6 +1,6 @@
 {
-  "version": "0.1.12-nightly.20261124.5178.personal.2",
-  "appImageHash": "sha256-PsBPVKCpq/2KjuwvimyT2s6P61n7SRaT9xrliiR0znY=",
+  "version": "0.1.12-nightly.20261124.5191.personal.1",
+  "appImageHash": "sha256-OPioqpbEhtpnVP/6aYcosGY9wzJtcapA7ZzsYk+ARe8=",
   "appImageName": "T3-Code-x86_64.AppImage",
   "repository": "skulldorged/t3code",
   "tagPrefix": "personal-v"
